@@ -90,6 +90,13 @@ label{display:block;font-weight:700;margin:0 0 6px}
 .blur{filter:blur(5px)}
 
 /* attached media mocks */
+.shotimg{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:zoom-in}
+.zoomhint{font:600 12px var(--f-mono);color:var(--accent)}
+.lb{position:fixed;inset:0;z-index:30;background:rgba(10,12,16,.92);display:flex;flex-direction:column}
+.lb .btn{margin:10px auto;background:#f2c230;border-color:#f2c230;color:#16181d}
+.lbin{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:0 8px 16px}
+.lbin img{display:block;width:max(100%,1100px);max-width:none;height:auto;margin:0 auto;border-radius:8px;background:#fff}
+@media(min-width:1150px){.lbin img{width:1100px}}
 .shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--soft)}
 .x{background:#000;color:#e7e9ea;padding:12px 14px;font-size:14px}
 .x .h{display:flex;gap:8px;align-items:center;margin-bottom:6px}
@@ -217,9 +224,9 @@ label{display:block;font-weight:700;margin:0 0 6px}
 <section id="start">
  <div class="hero">
   <div class="col">
-   <div class="kick">BÀN KIỂM CHỨNG THÔNG TIN</div>
+   <div class="kick">BÀN KIỂM CHỨNG · THẨM ĐỊNH TIN TỨC</div>
    <h1>Tin đúng – <span>Tin sai</span></h1>
-   <p>20 bài đăng thật trên Threads vào tháng 11/2026. Hãy đọc kỹ, tra cứu rồi đóng dấu.</p>
+   <p>20 bài đăng thật trên Threads, tháng 11/2026. Đọc kỹ, tra cứu, rồi đóng dấu.</p>
   </div>
   <svg viewBox="0 0 680 210" role="img" aria-label="Một bài đăng trên điện thoại được soi bằng kính lúp và đóng dấu đã kiểm chứng">
    <defs><path id="ring" d="M560,105 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
@@ -308,6 +315,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
  </div>
 </section>
 
+<div class="lb hidden" id="lb" role="dialog" aria-modal="true" aria-label="Ảnh phóng to"><button class="btn" type="button" id="lbClose">Đóng ảnh</button><div class="lbin"><img id="lbImg" alt=""></div></div>
 <div class="veil hidden" id="veil"></div>
 <div class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sq">
  <div class="col"><div class="grab"></div>
@@ -335,7 +343,7 @@ const D=[
 {kind:"Bài đăng Threads",who:["Tori","@to••••ze","77 người theo dõi · 06/11/2026"],
  body:"Sau 1 ngày lướt threads thì t sẽ tổng hợp và tóm tắt 3 rumor đang được thảo luận nhiều nhất sau sự việc các chính phủ yêu cầu người dân tích trữ lương thực:\n1. TẬN THẾ (Thứ 6, 13/11/2026), rumor xuất phát từ 1 bài đăng vào 1/1 trên diễn đàn theqoo Hàn Quốc. Trùng hợp, một số cư dân mạng TQ phát hiện ra vào ngày đó thông tin nhiệt độ trên app thời tiết trên điện thoại của họ ở 1 số khu vực giảm xuống thất thường ở mức -31°C trong khi những ngày khác nền nhiệt đều trên 9-10°C",
  media:{t:"wx"},acts:["8,7K","491","751","692K lượt xem"],
- c:[["doquyen","13/11 tận thế thì 15/11 có còn đi concert được không ạ, mình hỏi cho mình =))))))","—"],["alice••","Nó sẽ đến khi mọi người không ngờ tới nhất, còn cứ rầm rộ như thế này thì sẽ chẳng có gì xảy ra đâu.","101"]],
+ c:[["doq••","13/11 tận thế thì 15/11 có còn đi concert được không ạ, mình hỏi cho mình =))))))","—"],["alice••","Nó sẽ đến khi mọi người không ngờ tới nhất, còn cứ rầm rộ như thế này thì sẽ chẳng có gì xảy ra đâu.","101"]],
  claim:"Thứ Sáu <mark>13/11/2026 là ngày tận thế</mark>; dấu hiệu là ứng dụng thời tiết ở Trung Quốc báo -31°C hôm đó.",
  q:"tận thế 13/11/2026 -31 độ app thời tiết",
  r:[["tienphong.vn","Thực hư tin đồn thế giới sắp bước sang ngày tận thế 13/11","Mức -31°C đến -32°C xuất phát từ lỗi trên ứng dụng Thời tiết của Apple, chỉ hiện quanh 20h ngày 13/11 ở Bắc Kinh, Vũ Hán, Thượng Hải; trước và sau đó nhiệt độ bình thường. Cơ quan khí tượng Trung Quốc đã lên tiếng."],["tienphong.vn","\"Ngày tận thế hụt 13/11\": netizen người tích trữ đồ ăn, người lên dress code","Mốc 13/11/2026 bắt nguồn từ một nghiên cứu năm 1960, không phải dự báo thảm họa cụ thể. Ngày 13/11 đã khép lại, thế giới vẫn bình yên."],["Ghi chú","Đọc kỹ cả chuỗi","Ở phần cuối chuỗi, chính người tổng hợp viết rằng trong 3 tin đồn thì tin tận thế \"gần như không có khả năng nhất\" và -31°C \"là do lỗi app\"."]],
@@ -353,7 +361,7 @@ const D=[
  a:"dis",alt:["mis"],w:"Chuyện có thật nhưng xảy ra năm 2023: em ngã ngày 25/2, điều trị khoảng một tháng rồi mới hiến tạng. Bài trên X đăng ngày 25/11/2026, bỏ mốc thời gian và thêm chi tiết \"nhịn ăn\" để gợi ý mổ cướp tạng: dis. Người chia sẻ trên Threads tin thật và sợ, nên ở họ là mis (+1 điểm).",
  s:[["Sina/Bắc Kinh Nhật báo, 1/4/2023","https://news.sina.cn/2023-04-01/detail-imynvyne7228713.d.html?vt=4"],["Tân Hoa Xã: 7 ca ghép cùng lúc","https://www.news.cn/local/20250918/5107e2706cad4cf6aa13e7afe23ab1fc/c.html"]]},
 
-{kind:"Ảnh tin được chia sẻ trên Threads",who:["Đại Việt 12","@12••qa","Ảnh đính kèm trong một bài đăng · 03/11/2026"],
+{kind:"Ảnh tin được chia sẻ trên Threads",who:["Tài khoản ẩn danh","@12••qa","Ảnh đính kèm trong một bài đăng · 03/11/2026"],
  body:"Hai thẻ tin của Tuổi Trẻ và VTV24 được chụp lại, nằm trong ảnh đính kèm của một bài đăng:",
  media:{t:"news2"},acts:null,c:[],
  claim:"<mark>Thái Lan kêu gọi mỗi gia đình chuẩn bị túi sinh tồn</mark> đủ dùng trong 72 giờ khẩn cấp.",
@@ -375,14 +383,14 @@ const D=[
 {kind:"Bài đăng Threads",who:["Outis","@ou••••51","Tiểu sử: \"Chuyên gia thôi miên trị liệu tâm lý\" · 169 người theo dõi · 25/11/2026"],
  body:"Tôi rất rất hạn chế nhận điều trị UT. Trong 5 năm đổ lại đây tôi chỉ nhận 3 cases, thành công 2/3, case còn lại vì đã hoá xạ trị quá nhiều nên cơ thể không trụ nổi nữa. Cũng bởi lý do tần số của bệnh nhân UT xuống rất thấp nên tôi bị hao năng lượng vô cùng, tuy vẫn có thể tái tạo liên tục, nhưng mệt mỏi là điều khó tránh.\nCàng ít can thiệp tây y, càng nhiều cơ hội sống cho bệnh nhân UT. Đó là sự thật. Bạn có quyền tin hoặc không, k ảnh hưởng gì tới tôi.",
  media:null,acts:["98","17","4","8,4K lượt xem"],
- c:[["thiennguyen••","Tôi có thắc mắc nhỏ là sao bạn lại dùng năng lượng dự trữ của chính bạn, thay vì bạn chỉ là kênh dẫn năng lượng vũ trụ xuống để chuyển sang người bệnh chứ nhỉ?","5"],["Outis","về lý thuyết là vậy, các bệnh thông thường làm vậy rất đơn giản, nhưng thực tế 1 case UT không đơn giản như thế bạn ạ","6",1]],
+ c:[["thiennguyen••","Tôi có thắc mắc nhỏ là sao bạn lại dùng năng lượng dự trữ của chính bạn, thay vì bạn chỉ là kênh dẫn năng lượng vũ trụ xuống để chuyển sang người bệnh chứ nhỉ?","5"],["Tác giả","về lý thuyết là vậy, các bệnh thông thường làm vậy rất đơn giản, nhưng thực tế 1 case UT không đơn giản như thế bạn ạ","6",1]],
  claim:"<mark>Càng ít can thiệp Tây y</mark> (hoá trị, xạ trị), bệnh nhân ung thư <mark>càng có nhiều cơ hội sống</mark>.",
  q:"liệu pháp thay thế ung thư tỷ lệ tử vong nghiên cứu",
  r:[["medicine.yale.edu","Finally, data about alternative medicine and cancer","Nghiên cứu của Đại học Yale (JNCI) trên dữ liệu ung thư quốc gia Mỹ: bệnh nhân chọn liệu pháp chưa được chứng minh thay cho điều trị chuẩn có nguy cơ tử vong trong khoảng 5,5 năm cao gấp 2,5 lần; với ung thư vú cao gần 6 lần."],["Ghi chú","Ai đang nói?","Tài khoản tự giới thiệu là chuyên gia thôi miên trị liệu, đang mô tả dịch vụ chữa ung thư \"bằng năng lượng\" của chính mình, không dẫn bằng chứng nào."]],
  a:"dis",alt:[],w:"Người đăng quảng bá dịch vụ của chính mình, khẳng định \"đó là sự thật\" không dẫn chứng, đổ lỗi ca tử vong cho hoá xạ trị. Bằng chứng nghiên cứu cho thấy điều ngược lại: dis.",
  s:[["Yale Medicine","https://medicine.yale.edu/news-article/finally-data-about-alternative-medicine-and-cancer"]]},
 
-{kind:"Bình luận trên Threads",parent:"Trả lời bài tổng hợp tin đồn \"tận thế 13/11/2026\" (692K lượt xem)",who:["Nam D.","@na••••44","06/11/2026"],
+{kind:"Bình luận trên Threads",parent:"Trả lời bài tổng hợp tin đồn \"tận thế 13/11/2026\" (692K lượt xem)",who:["Tài khoản ẩn danh","@na••••44","06/11/2026"],
  body:"Cái vụ 13/11 là tận thế xuất phát từ một nghiên cứu về dân số từ những năm 60s. Nghiên cứu này sử dụng một MÔ HÌNH TOÁN HỌC và mô hình này cho ra dự đoán là dân số thế giới sẽ đạt vô cực vào ngày 13/11/2026 (tận thế).",
  media:null,acts:["162","3","2","—"],c:[],
  claim:"Mốc 13/11/2026 bắt nguồn từ <mark>một nghiên cứu dân số năm 1960</mark>, có mô hình toán cho kết quả dân số tiến tới vô cực vào ngày đó.",
@@ -395,7 +403,7 @@ const D=[
  body:"Disclaimer: không ghen tị phụ nữ thành đạt.\nNma bà này tai tiếng trong giới academic lắm, học PhD xong bị đuổi, nhận bằng master. Bị phản ánh rất nhiều về tác phong làm việc từ những người quen biết. Suốt ngày lên các group học tập phát ngôn linh tinh để lùa gà mentor du học.\nGiới học thuật nó ngộ lắm, nhân tài thì ẩn dật, ngại khoe, người hay khoe thì phần lớn có mục đích.",
  media:{t:"qp",text:"hết mạt sát phụ nữ tài giỏi độc thân, chúng tôi chuyển mục tiêu qua phụ nữ tài giỏi làm việc và sinh sống ngoài nước",cap:"Ảnh chụp bài khoe thành tích của một phụ nữ làm mentor du học ở Mỹ (đã che)"},
  acts:["375","38","14","26,8K lượt xem sau 1 giờ"],
- c:[["tuyet••","<span class=\"redact\">Họ tên đầy đủ</span> phải không tar? Trời ơi, bà này cựu sv trường <span class=\"redact\">tên trường</span> cùng khoa, khoá trên với mình nè. Bà này phông bạt thôi các bác.","45"],["elk••","chấm xin info","—"],["badger (tác giả)","300 mentee kia chắc chị nhận vơ quá nửa, nhiều bài phốt rồi mn tự tìm lại xem :v","27",1]],
+ c:[["tuyet••","<span class=\"redact\">Họ tên đầy đủ</span> phải không tar? Trời ơi, bà này cựu sv trường <span class=\"redact\">tên trường</span> cùng khoa, khoá trên với mình nè. Bà này phông bạt thôi các bác.","45"],["elk••","chấm xin info","—"],["Tác giả","300 mentee kia chắc chị nhận vơ quá nửa, nhiều bài phốt rồi mn tự tìm lại xem :v","27",1]],
  claim:"Bài viết và phần bình luận nói về <mark>một người phụ nữ cụ thể</mark>: bị đuổi khỏi chương trình tiến sĩ, tác phong kém, nhận vơ học trò; kèm <mark>họ tên và trường cũ</mark> của cô.",
  q:"rời chương trình tiến sĩ nhận bằng thạc sĩ Mỹ",
  r:[["Ghi chú","Những gì tra được","Không có nguồn độc lập nào xác nhận các cáo buộc; tác giả chỉ dựa vào \"người quen phản ánh\" và bảo người đọc \"tự tìm\". Ở Mỹ, rời chương trình tiến sĩ với bằng thạc sĩ khá phổ biến và có nhiều lý do, không nhất thiết là bị đuổi."],["rm.coe.int · Hội đồng châu Âu, 2017","Information Disorder: Toward an interdisciplinary framework","Malinformation: thông tin (thật) được chia sẻ để gây hại, thường bằng cách đưa thông tin vốn riêng tư ra công khai."]],
@@ -421,7 +429,7 @@ const D=[
  a:"t",alt:[],w:"Đúng, nhưng là tin tháng 4/2023. Hãy để ý ngày đăng: một tin thật có thể bị lấy lại ba năm sau với nội dung khác (xem thẻ 2).",
  s:[["Sina/Bắc Kinh Nhật báo","https://news.sina.cn/2023-04-01/detail-imynvyne7228713.d.html?vt=4"]]},
 
-{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Wade","@wa••••od","13/11/2026"],
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Tài khoản ẩn danh","@wa••••od","13/11/2026"],
  body:"Nếu ráy tai ướt tự nhiên khả năng cao là bạn sẽ bị HÁCH NÔI (do bạn có gen ABCC11), còn nếu ráy tai khô tự nhiên thì không bị nhé",
  media:null,acts:["4,3K","84","55","—"],
  c:[["hi.t••","1 bên ướt 1 bên khô thì hôi 1 bên thôi đúng k ạ","533"],["totrinh••","Với 1 đứa ráy ướt và phải vệ sinh tai hằng ngày thì t xác nhận là nách t rất dễ có mùi...","1,2K"]],
@@ -431,7 +439,7 @@ const D=[
  a:"t",alt:[],w:"Đúng. Gen ABCC11 quyết định cả kiểu ráy tai lẫn một phần mùi nách. \"Khả năng cao\" là cách nói hợp lý; mùi còn phụ thuộc vệ sinh và vi khuẩn trên da.",
  s:[["BMC Genetics 2009 (PubMed)","https://pubmed.ncbi.nlm.nih.gov/19650936/"],["The Scientist","https://www.the-scientist.com/how-are-earwax-and-body-odor-linked-72476"]]},
 
-{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Gazelle","@ga••••30","13/11/2026"],
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Tài khoản ẩn danh","@ga••••30","13/11/2026"],
  body:"lưỡi không cảm nhận được \"vị cay\", cái sự cay 🥵 mà mọi người đề cập là do lưỡi đang bị đau",
  media:null,acts:["1,1K","5","4","—"],c:[],
  claim:"<mark>Cay không phải là một vị</mark>; cảm giác cay thực chất là <mark>cảm giác đau</mark>.",
@@ -440,7 +448,7 @@ const D=[
  a:"t",alt:[],w:"Đúng. Năm vị cơ bản là ngọt, mặn, chua, đắng, umami. Cay là tín hiệu từ thụ thể đau và nhiệt TRPV1.",
  s:[["HKUST Science Focus","https://sciencefocus.hkust.edu.hk/node/125"],["Siebert và cộng sự (PMC)","https://pmc.ncbi.nlm.nih.gov/articles/PMC9795841"]]},
 
-{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Gi Hoa","@gi••••38","13/11/2026"],
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Tài khoản ẩn danh","@gi••••38","13/11/2026"],
  body:"4. Gen của mình luôn muốn tiến hoá tốt hơn nên nó sẽ tự chọn những thứ cơ thể không có. Vd người ít tóc thích người nhiều tóc, lùn thích cao\n5. Ngón cái chạm đầu ngón áp út cả hai bàn tay thì hít thở chỉ đến lồng ngực...\n6. Móng tay có hình bán nguyệt màu trắng ở gốc càng nhiều thì sinh lý càng tốt (có thể thay đổi liên tục)",
  media:null,acts:["3,3K","15","42","—"],
  c:[["for.t••","Cái fact số 1 t thường ngửi để test người khác xem có thích mình không... t đã thử nhiều người và cảm thấy khá đúng ây","677"]],
@@ -479,9 +487,9 @@ const D=[
  a:"mis",alt:[],w:"Nửa đúng. Singapore cấm nhập khẩu và bán kẹo cao su từ 1992, nhưng nhai thì không phạm luật. Hiểu nhầm phổ biến, người viết tin thật: mis.",
  s:[["Changi Airport","https://nowboarding.changiairport.com/live-local/Unusual-laws-in-Singapore.html"],["Wikipedia","https://en.wikipedia.org/wiki/Chewing_gum_sales_ban_in_Singapore"]]},
 
-{kind:"Bài đăng Threads",who:["Đức A.","@du••••nh","Tiểu sử: \"Chuyên viên cung cấp phòng trọ\" · 84 người theo dõi · 22/07/2026"],
+{kind:"Bài đăng Threads",who:["Tài khoản ẩn danh","@du••••nh","Tiểu sử: \"Chuyên viên cung cấp phòng trọ\" · 84 người theo dõi · 22/07/2026"],
  body:"Góc thắc mắc: mấy bài viết như này là thật hay lừa đảo thread vậy anh em?",
- media:{t:"salary"},acts:["584","66","8","168K lượt xem"],
+ media:{t:"salary"},acts:null,
  c:[["_banh••","ùa, chúng nó là một tổ chức lun, đứa này up bài mấy đứa kia dô seeding","182"],["taolao••","Lừa, câu tương tác, gài mn nhập mã người mới để chúng nó được chia hoa hồng","35"],["tokut••","ê tui lỡ nhập theo mã rồi sao g..","2",1]],
  claim:"Học sinh có thể <mark>nhận \"lương Threads\" mỗi ngày</mark> như ảnh biến động số dư trong bài.",
  q:"nhận lương Threads 1 triệu mỗi ngày có thật không",
@@ -492,7 +500,7 @@ const D=[
 {kind:"Bài đăng Threads",who:["Cỏ","@hc••••a_","4 người theo dõi · 06/10/2026"],
  body:"Ôi cái này phải lừa đảo ko. Mình đi khám được hai hôm thì có người nhắn thế này:)))",
  media:{t:"zalo"},acts:["3,4K","177","11","733K lượt xem"],
- c:[["ngoc_a••","Không biết bsi của mình hả b 🥲 Nhiều khi bsi phát hiện ra cgi họ tìm b á. Chuyện bth","630"],["Cỏ (tác giả)","Nhưng bác trước khám cho mình là một bác trung niên bạn ạ🥹. Mà nick đó cũng chỉ có ảnh đại diện để hình phong cảnh thui.","373",1],["bbongj••","T kbt có phải lừa k nhưng cái ông này cũng gửi kb cho t với cùng 1 tin nhắn. Vấn đề là tháng trước t k đi khám ở đâu cả😇","504"],["Cỏ (tác giả)","Nó đổi tên r cả nhà ơi😞","166"]],
+ c:[["ngoc_a••","Không biết bsi của mình hả b 🥲 Nhiều khi bsi phát hiện ra cgi họ tìm b á. Chuyện bth","630"],["Tác giả","Nhưng bác trước khám cho mình là một bác trung niên bạn ạ🥹. Mà nick đó cũng chỉ có ảnh đại diện để hình phong cảnh thui.","373",1],["bbongj••","T kbt có phải lừa k nhưng cái ông này cũng gửi kb cho t với cùng 1 tin nhắn. Vấn đề là tháng trước t k đi khám ở đâu cả😇","504"],["Tác giả","Nó đổi tên r cả nhà ơi😞","166"]],
  claim:"Người gửi lời mời kết bạn Zalo là <mark>bác sĩ đã khám cho chủ bài viết</mark>, muốn hỏi thêm về bệnh.",
  q:"mạo danh bác sĩ bệnh viện kết bạn Zalo lừa đảo",
  r:[["lsvn.vn","Cảnh giác chiêu lừa mạo danh nhân viên bệnh viện để bán sữa, vay tiền","Để tạo lòng tin, kẻ lừa đảo còn gửi cả dữ liệu khám chữa bệnh BHYT của người bệnh qua Zalo, Facebook."],["cafef.vn","Bệnh viện Bạch Mai cảnh báo lừa đảo","Người dân được \"nhân viên\" kết bạn Zalo để xác nhận lịch khám rồi bị yêu cầu chuyển tiền; đến viện mới biết mình không có tên trong hệ thống."]],
@@ -512,7 +520,7 @@ const D=[
 {kind:"Bài đăng Threads",who:["Thanh H.","@hu••••99","Tiểu sử: dịch vụ du lịch, đổi ngoại tệ · 110 người theo dõi · 08/08/2026"],
  body:"❌GÓC BÓC PHỐT BẠN Ở GHÉP ❌\n<span class=\"redact\">HỌ VÀ TÊN ĐẦY ĐỦ</span>\n- Ai quen biết con này thì kêu b ý thanh toán tiền nhà cho em nhé, ở tiền nhà không muốn đóng, 3 tháng trả được 1tr5, đồ cá nhân của t cũng tự ý lấy dùng... đồ ăn vặt t mua cũng bị nó chén hết...\n- Thường xuyên dắt bạn về ban đêm mặc dù chủ nhà căn dặn không được phép.",
  media:{t:"blurphotos"},acts:["16,7K","1,9K","554","2,7 triệu lượt xem · 10,1K chia sẻ"],
- c:[["Thanh H. (tác giả)","Tìm ra được Insta của nó, và rất bất ngờ, quần áo nó mặc cái nào cũng là của toy.","1,8K",1],["boar••","có link không bà","190"],["ndqn••","Khiếp thế =))) hãm đến thế là cùng","786"]],
+ c:[["Tác giả","Tìm ra được Insta của nó, và rất bất ngờ, quần áo nó mặc cái nào cũng là của toy.","1,8K",1],["boar••","có link không bà","190"],["ndqn••","Khiếp thế =))) hãm đến thế là cùng","786"]],
  claim:"Một cô gái ở ghép <mark>nợ tiền nhà, tự ý dùng đồ của bạn cùng phòng</mark>; bài đăng nêu <mark>họ tên thật và Instagram</mark> của cô.",
  q:"đăng thông tin cá nhân người khác lên mạng bóc phốt",
  r:[["Ghi chú","Những gì tra được","Không có nguồn độc lập nào; câu chuyện chỉ từ một phía. Người bị nêu tên là một cá nhân bình thường, không phải người của công chúng."],["rm.coe.int · Hội đồng châu Âu, 2017","Information Disorder","Malinformation: thông tin thật được chia sẻ để gây hại, thường bằng cách đưa thông tin vốn riêng tư ra công khai."]],
@@ -530,6 +538,11 @@ const D=[
  s:[["Council of Europe, Information Disorder (2017)","https://rm.coe.int/information-disorder-toward-an-interdisciplinary-framework-for-researc/168076277c"]]}
 ];
 
+/* ảnh chụp thật từ Threads (đã che tên tài khoản): số thẻ: [tên file, 1 = ảnh là cả bài đăng, 0 = ảnh đính kèm] */
+const IMG={1:["the01",1],2:["the02",1],3:["the03",0],4:["the04",1],5:["the05",1],7:["the07",1],8:["the08",1],13:["the13",1],14:["the14",1],15:["the15",1],16:["the16",0],17:["the17",1],18:["the18",1],19:["the19",1],20:["the20",1]};
+D.forEach((d,i)=>{const x=IMG[i+1];if(x){d.img="img/"+x[0]+".jpg";d.full=x[1]}});
+D[12].c=[];D[13].c=[];
+D[18].more="2/3 – Ai quen biết con này thì kêu b ý thanh toán tiền nhà cho em nhé, ở tiền nhà không muốn đóng, 3 tháng trả được 1tr5, đồ cá nhân của t cũng tự ý lấy dùng thản nhiên như của nó... đồ ăn vặt t mua rất nhiều cũng bị nó chén hết.\n3/3 – Thường xuyên dắt bạn về ban đêm mặc dù chủ nhà căn dặn không được phép. CÒN RẤT NHIỀU CHUYỆN BỨC XÚC NHƯNG THÔI, nhiêu đây đủ hiểu 1 con người.";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ini=n=>esc(String(n).replace(/[^A-Za-zÀ-ỹĐđ0-9]/g,"").slice(0,1).toUpperCase()||"?");
@@ -567,9 +580,16 @@ function renderPost(d){
  const n=st.i;
  let h="";
  if(d.parent)h+=`<div class="parent">↳ <b>${esc(d.parent)}</b></div>`;
+ if(d.img&&d.full){
+  h+=`<img class="shotimg" src="${esc(d.img)}" alt="Ảnh chụp bài đăng trên Threads, tên tài khoản đã được che" loading="lazy">`;
+  if(d.more)h+=`<div class="parent" style="border:0;margin:12px 0 0;padding:0"><b>CÁC PHẦN TIẾP THEO TRONG CHUỖI</b></div><div class="body" style="margin-top:4px">${esc(d.more)}</div>`;
+  h+=`<p class="sub" style="margin:8px 0 0"><span class="zoomhint">Chạm vào ảnh để phóng to</span> · ảnh chụp từ Threads, tên tài khoản đã được che</p>`;
+  if(d.c.length)h+=`<div class="cmts"><div class="sub">MỘT SỐ BÌNH LUẬN KHÁC</div>${d.c.map((c,k)=>`<div class="cmt${c[3]?" r":""}"><span class="ava sm" style="background:${AV[(n+k+2)%AV.length]}">${ini(c[0])}</span><div><div class="n">${esc(c[0])}<em>♥ ${esc(c[2])}</em></div><div>${c[1].includes("<span")?c[1]:esc(c[1])}</div></div></div>`).join("")}</div>`;
+  return h+`<div id="stampSlot"></div>`;
+ }
  h+=`<div class="who"><span class="ava" style="background:${AV[n%AV.length]}">${ini(d.who[0])}</span><div><div class="name">${esc(d.who[0])}</div><div class="sub">${esc(d.who[1])} · ${esc(d.who[2])}</div></div></div>`;
  h+=`<div class="body${d.news?" news":""}">${d.body.includes("<span")?d.body:esc(d.body)}</div>`;
- h+=media(d.media);
+ h+=d.img&&!d.full?`<div class="media"><img class="shotimg" src="${esc(d.img)}" alt="Ảnh đính kèm trong bài đăng, tên tài khoản đã được che" loading="lazy"><p class="zoomhint" style="margin:6px 0 0">Chạm vào ảnh để phóng to</p></div>`:media(d.media);
  if(d.acts)h+=`<div class="acts"><span>${ic("heart")}${esc(d.acts[0])}</span><span>${ic("cmt")}${esc(d.acts[1])}</span><span>${ic("rep")}${esc(d.acts[2])}</span><span>${esc(d.acts[3])}</span></div>`;
  if(d.c.length)h+=`<div class="cmts">${d.c.map((c,k)=>`<div class="cmt${c[3]?" r":""}"><span class="ava sm" style="background:${AV[(n+k+2)%AV.length]}">${ini(c[0])}</span><div><div class="n">${esc(c[0])}<em>♥ ${esc(c[2])}</em></div><div>${c[1].includes("<span")?c[1]:esc(c[1])}</div></div></div>`).join("")}</div>`;
  h+=`<div id="stampSlot"></div>`;
@@ -669,10 +689,13 @@ $("resume").addEventListener("click",()=>{const v=load();if(!v)return;st=v;st.lo
 $("stamps").addEventListener("click",e=>{const b=e.target.closest(".sbtn");if(b&&!b.disabled)pick(b.dataset.k)});
 $("nextBtn").addEventListener("click",next);
 $("lookBtn").addEventListener("click",openSheet);
+$("post").addEventListener("click",e=>{const im=e.target.closest(".shotimg");if(!im)return;$("lbImg").src=im.src;$("lb").classList.remove("hidden");$("lbClose").focus()});
+$("lbClose").addEventListener("click",()=>{$("lb").classList.add("hidden");$("lbImg").src=""});
 $("closeSheet").addEventListener("click",closeSheet);
 $("veil").addEventListener("click",closeSheet);
 $("againBtn").addEventListener("click",()=>{wipe();st=null;$("teamName").value="";$("resume").classList.add("hidden");show("start");$("teamName").focus()});
 document.addEventListener("keydown",e=>{
+ if(!$("lb").classList.contains("hidden")){if(e.key==="Escape")$("lbClose").click();return}
  if(!$("sheet").classList.contains("hidden")){if(e.key==="Escape")closeSheet();return}
  if($("play").classList.contains("hidden")||e.target.tagName==="INPUT")return;
  const n=parseInt(e.key,10);
