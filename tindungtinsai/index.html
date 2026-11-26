@@ -36,7 +36,9 @@ a{color:inherit}
 .hero h1{font-size:clamp(36px,8vw,52px);line-height:1.05;margin:4px 0 8px;font-weight:800;text-wrap:balance}
 .hero h1 span{background:linear-gradient(transparent 58%,#f2c230 58%);color:#fff;padding:0 4px}
 .hero p{margin:0;color:#d5efeb;max-width:56ch}
-.hero svg{display:block;width:100%;height:auto;margin-top:18px}
+.hero svg{display:block;width:100%;max-width:680px;height:auto;margin:18px auto 0}
+.hero{background:linear-gradient(to bottom,var(--deep) calc(100% - 60px),#0e7469 calc(100% - 60px))}
+@media(max-width:680px){.hero{background:linear-gradient(to bottom,var(--deep) calc(100% - 8.8vw),#0e7469 calc(100% - 8.8vw))}}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:18px 0}
 .panel h2{font-size:20px;margin:0 0 12px}
 .legend{display:grid;gap:10px;margin:0;padding:0;list-style:none}
