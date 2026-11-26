@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tin đúng – Tin sai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Noto+Serif:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* VOICE: bàn kiểm chứng của toà soạn sinh viên: nhanh, có chút hồi hộp, chữ rõ
+   IDEA: một dòng thời gian Threads bị đưa lên bàn biên tập; mỗi bài được tra cứu rồi đóng dấu
+   PICTURE: bài đăng giả lập đầy đủ (tài khoản, ảnh đính kèm, bình luận) và con dấu đỏ đóng lên
+   COLOUR and TYPE: xanh mòng két toà soạn, giấy trắng, bút dạ vàng, dấu đỏ; Be Vietnam Pro, Noto Serif cho báo, JetBrains Mono cho số
+   LAYOUT: một cột 680px; thanh trên dính; bài đăng, nhận định, nút; bảng tra cứu trượt lên từ dưới */
+:root{color-scheme:light dark;
+ --bg:light-dark(#eef0f2,#0f1115);--card:light-dark(#ffffff,#181b21);--ink:light-dark(#16181d,#eceef2);
+ --muted:light-dark(#626977,#9aa1ad);--line:light-dark(#e0e3e8,#2a2f38);--soft:light-dark(#f3f4f6,#20242c);
+ --accent:light-dark(#0e7469,#3cc4b4);--deep:light-dark(#0b4f48,#0b2b28);--hl:light-dark(#ffe066,#f2c230);
+ --red:light-dark(#d92d3a,#ff6b76);--ok:light-dark(#1f8a4c,#5bd49a);
+ --c-t:#1f8a4c;--c-mis:#e07b00;--c-dis:#d92d3a;--c-mal:#6b2fbf;--c-sat:#1f6fd1;
+ --f-ui:"Be Vietnam Pro",system-ui,sans-serif;--f-serif:"Noto Serif",Georgia,serif;--f-mono:"JetBrains Mono",ui-monospace,monospace}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-ui);overflow-x:clip}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+.hidden{display:none!important}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.col{max-width:680px;margin:0 auto;padding:0 14px}
+.mono{font-family:var(--f-mono)}
+
+/* intro */
+.hero{background:var(--deep);color:#fff;padding:34px 0 0;overflow:hidden}
+.hero .col{display:grid;gap:4px}
+.kick{font:700 12px var(--f-mono);letter-spacing:.06em;color:#9fe3da}
+.hero h1{font-size:clamp(36px,8vw,52px);line-height:1.05;margin:4px 0 8px;font-weight:800;text-wrap:balance}
+.hero h1 span{background:linear-gradient(transparent 58%,#f2c230 58%);color:#fff;padding:0 4px}
+.hero p{margin:0;color:#d5efeb;max-width:56ch}
+.hero svg{display:block;width:100%;height:auto;margin-top:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:18px 0}
+.panel h2{font-size:20px;margin:0 0 12px}
+.legend{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.legend li{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center}
+.chip{display:inline-flex;justify-content:center;font:800 13px var(--f-ui);border:2px solid currentColor;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.howto{margin:14px 0 0;padding-left:20px;color:var(--muted)}
+.howto li{margin:4px 0}
+label{display:block;font-weight:700;margin:0 0 6px}
+.field{width:100%;min-height:50px;border:2px solid var(--ink);border-radius:12px;padding:10px 14px;background:var(--card);font-size:17px}
+.btn{min-height:48px;border-radius:12px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font-weight:800;padding:10px 20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.teal{background:var(--accent);border-color:var(--accent);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .col{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding-top:10px;padding-bottom:10px}
+.team{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clock,.pts{font:700 14px var(--f-mono);white-space:nowrap}
+.pts{background:var(--ink);color:var(--bg);border-radius:999px;padding:4px 10px}
+.bar .col.dots{display:flex;gap:4px;padding-top:0;padding-bottom:10px;flex-wrap:nowrap}
+.dots i{flex:1 1 0;height:5px;border-radius:3px;background:var(--line);min-width:6px}
+.dots i.g{background:var(--ok)}.dots i.h{background:var(--c-mis)}.dots i.b{background:var(--red)}.dots i.now{background:var(--ink)}
+
+/* post */
+.stage{padding:16px 0 40px}
+.cardno{font:700 12px var(--f-mono);color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between;gap:8px}
+.post{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;overflow:hidden}
+.parent{border-bottom:1px dashed var(--line);margin:-4px 0 12px;padding-bottom:10px;font-size:14px;color:var(--muted)}
+.parent b{color:var(--ink)}
+.who{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center}
+.ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px}
+.ava.sm{width:28px;height:28px;font-size:12px}
+.name{font-weight:700;line-height:1.2}
+.name .tick{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#1d9bf0;color:#fff;font-size:10px;margin-left:4px;vertical-align:1px}
+.sub{font:500 12px var(--f-mono);color:var(--muted)}
+.body{margin:12px 0 0;white-space:pre-line}
+.body.news{font-family:var(--f-serif)}
+.media{margin-top:12px}
+.acts{display:flex;gap:18px;margin-top:12px;color:var(--muted);font:500 13px var(--f-mono);flex-wrap:wrap}
+.acts span{display:inline-flex;gap:5px;align-items:center}
+.acts svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+.cmts{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:grid;gap:10px}
+.cmt{display:grid;grid-template-columns:28px 1fr;gap:8px;font-size:14px}
+.cmt .n{font-weight:700;font-size:13px}
+.cmt .n em{font-style:normal;font:500 11px var(--f-mono);color:var(--muted);margin-left:6px}
+.cmt.r{margin-left:34px}
+.redact{background:repeating-linear-gradient(135deg,var(--ink) 0 6px,#555 6px 10px);color:transparent;border-radius:3px;padding:0 4px;user-select:none}
+.blur{filter:blur(5px)}
+
+/* attached media mocks */
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--soft)}
+.x{background:#000;color:#e7e9ea;padding:12px 14px;font-size:14px}
+.x .h{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.x .h b{color:#fff}.x .h span{color:#71767b;font-size:12px}
+.x .tr{color:#71767b;font-size:11px;margin-bottom:4px}
+.x .ft{color:#71767b;font:500 11px var(--f-mono);margin-top:8px}
+.x hr{border:0;border-top:1px solid #2f3336;margin:10px 0}
+.wx{background:linear-gradient(160deg,#2b5876,#4e4376);color:#fff;padding:14px;font-size:14px}
+.wx .city{font-weight:700;font-size:16px}
+.wx .hours{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px;text-align:center;font:500 12px var(--f-mono)}
+.wx .hours div{background:rgba(255,255,255,.12);border-radius:8px;padding:6px 2px}
+.wx .hours b{display:block;font-size:16px;font-family:var(--f-ui)}
+.wx .hours .odd{background:#d92d3a}
+.newsc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}
+.nc{background:#c8102e;color:#fff;border-radius:8px;padding:10px;font-weight:800;font-size:13px;line-height:1.3;display:grid;gap:6px;align-content:start}
+.nc small{font:600 10px var(--f-mono);opacity:.85}
+.nc.vtv{background:#d3202f}
+.gov{background:#fff;color:#16181d;padding:12px;font-family:var(--f-serif)}
+.gov .m{font:700 11px var(--f-ui);color:#c8102e;text-align:center;border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:8px}
+.gov h4{margin:0 0 6px;font-size:16px;line-height:1.3}
+.gov p{margin:0;font-size:12px;color:#555}
+.clip{background:#fffdf7;color:#222;padding:14px;font-family:var(--f-serif);border-left:4px solid #c8102e}
+.clip .src{font:700 11px var(--f-mono);color:#c8102e;margin-bottom:6px}
+.clip h4{margin:0 0 6px;font-size:17px;line-height:1.3}
+.clip p{margin:0;font-size:14px}
+.bank{background:#1c1c1e;color:#fff;border-radius:14px;padding:12px 14px;margin:10px;display:grid;grid-template-columns:36px 1fr;gap:10px;font-size:13px}
+.bank .ic{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#7b2ff7,#f107a3);display:grid;place-items:center;font-weight:800}
+.bank b{font-size:14px}.bank .t{color:#aaa;font-size:11px;float:right}
+.zalo{background:#2c2c2e;color:#fff;border-radius:14px;padding:12px 14px;margin:10px;display:grid;grid-template-columns:36px 1fr;gap:10px;font-size:14px}
+.zalo .ic{width:36px;height:36px;border-radius:9px;background:#0068ff;display:grid;place-items:center;font-weight:800;font-size:12px}
+.zalo .t{color:#aaa;font-size:11px;float:right}
+.fb{background:#fff;color:#1c1e21;padding:12px}
+.fb .ttl{font-weight:700;margin-bottom:8px}
+.fb .ppl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fb .p{border:1px solid #ddd;border-radius:8px;overflow:hidden;font-size:12px}
+.fb .p i{display:block;height:58px;background:linear-gradient(135deg,#b0bec5,#78909c);filter:blur(2px)}
+.fb .p div{padding:6px}
+.fb .p span{display:block;background:#e7f3ff;color:#1877f2;border-radius:6px;text-align:center;font-weight:700;margin-top:4px;padding:3px}
+.ig{background:#fff;color:#000;padding:14px;display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center}
+.ig i{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#feda75,#d62976,#4f5bd5);filter:blur(3px)}
+.ig .st{display:flex;gap:12px;font-size:12px}.ig .st b{display:block;font-size:15px}
+.ig .eb{grid-column:1/-1;background:#efefef;border-radius:8px;text-align:center;font-weight:700;font-size:14px;padding:7px}
+.qp{background:var(--card);padding:12px;display:grid;gap:8px;font-size:14px}
+.qp .ph{height:120px;border-radius:10px;background:linear-gradient(160deg,#8aa4c8,#d7c6b8);display:grid;place-items:center;color:#fff;font:700 12px var(--f-mono)}
+
+/* claim + controls */
+.claim{margin:14px 0 0;background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:14px 16px}
+.claim .k{font:700 12px var(--f-mono);color:var(--muted)}
+.claim p{margin:4px 0 0;font-weight:700;font-size:18px;line-height:1.4}
+.claim p mark{background:var(--hl);color:#16181d;padding:0 3px;border-radius:3px}
+.tools{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0 8px;flex-wrap:wrap}
+.tools .hint{font-size:13px;color:var(--muted)}
+.stamps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.sbtn{min-height:68px;border-radius:14px;border:2.5px solid var(--c);color:var(--c);background:var(--card);cursor:pointer;font-weight:800;display:grid;place-items:center;align-content:center;gap:2px;padding:6px 4px;line-height:1.15;transition:transform .12s}
+.sbtn small{font:500 11px var(--f-mono);color:var(--muted)}
+.sbtn:hover:not(:disabled){background:var(--c);color:#fff;transform:translateY(-2px)}
+.sbtn:hover:not(:disabled) small{color:#fff}
+.sbtn:disabled{cursor:default;opacity:.35}
+.sbtn.right{opacity:1;background:var(--c);color:#fff}.sbtn.right small{color:#fff}
+.sbtn.mine{opacity:1;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink)}
+.stamp{position:absolute;right:16px;bottom:16px;width:140px;height:140px;pointer-events:none;transform:rotate(-12deg);opacity:.92}
+.stamp.go{animation:thump .35s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes thump{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:.92}}
+
+/* verdict */
+.verdict{margin-top:14px;background:#16181d;color:#eceef2;border-radius:18px;padding:18px}
+.verdict .vt{font-size:20px;font-weight:800;margin:0 0 4px}
+.verdict .vt.g{color:#5bd49a}.verdict .vt.h{color:#ffb347}.verdict .vt.b{color:#ff6b76}
+.verdict p{margin:8px 0 0;color:#d5d9e0}
+.verdict ul{margin:10px 0 0;padding-left:18px;font-size:14px}
+.verdict a{color:#9fe3da;overflow-wrap:anywhere}
+.verdict .nx{display:flex;justify-content:flex-end;margin-top:14px}
+.verdict .btn{background:#f2c230;border-color:#f2c230;color:#16181d}
+
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(10,12,16,.55);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:82vh;overflow:auto;background:var(--card);border-radius:20px 20px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);animation:up .25s ease both}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet .col{padding-top:10px;padding-bottom:24px}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sbar{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:999px;padding:10px 14px;font-size:15px}
+.sbar svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.res{display:grid;gap:14px;margin:16px 0}
+.res article{border-bottom:1px solid var(--line);padding-bottom:12px}
+.res .d{font:500 12px var(--f-mono);color:var(--ok)}
+.res h4{margin:2px 0 4px;font-size:16px;color:var(--accent);line-height:1.35}
+.res p{margin:0;font-size:14px;color:var(--muted)}
+.res .note{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:14px}
+
+/* end */
+.final{background:#16181d;color:#eceef2;border-radius:20px;padding:22px;margin-top:18px;position:relative;overflow:hidden}
+.final .kick{color:#9fe3da}
+.final h2{margin:4px 0 0;font-size:26px}
+.rank{display:inline-block;background:#f2c230;color:#16181d;font-weight:800;border-radius:999px;padding:4px 12px;margin-top:8px}
+.big{font:700 clamp(64px,16vw,104px)/1 var(--f-mono);margin:14px 0 4px}
+.big span{font-size:.3em;color:#9aa1ad}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.tiles div{background:#22262e;border-radius:12px;padding:10px}
+.tiles b{display:block;font:700 22px var(--f-mono)}
+.tiles small{color:#9aa1ad;font-size:12px}
+.code{font:700 15px var(--f-mono);background:#f2c230;color:#16181d;border-radius:10px;padding:8px 12px;display:inline-block;overflow-wrap:anywhere}
+.send{margin-top:14px;padding:12px;border-radius:12px;background:#22262e;font-size:14px}
+.send.ok{background:#173b29}.send.fail{background:#3b1b1f}
+.final .btn{background:#f2c230;border-color:#f2c230;color:#16181d}
+.final .btn.ghost{background:transparent;color:#eceef2;border-color:#eceef2}
+.list{margin-top:16px;display:grid;gap:6px}
+.list div{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px}
+.list b{font-family:var(--f-mono)}
+.list .s{font:700 13px var(--f-mono)}
+
+@media(max-width:600px){
+ .stamps{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stamps .sbtn:first-child{grid-column:1/-1}
+ .stamp{width:112px;height:112px;right:10px;bottom:10px}
+ .tools .hint{display:none}
+ .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .legend li{grid-template-columns:92px 1fr}
+ .wx .hours{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.stamp.go,.sheet{animation:none}.sbtn{transition:none}}
+</style>
+</head>
+<body>
+
+<section id="start">
+ <div class="hero">
+  <div class="col">
+   <div class="kick">BÀN KIỂM CHỨNG · THẨM ĐỊNH TIN TỨC</div>
+   <h1>Tin đúng – <span>Tin sai</span></h1>
+   <p>20 bài đăng thật trên Threads, tháng 11/2026. Đọc kỹ, tra cứu, rồi đóng dấu.</p>
+  </div>
+  <svg viewBox="0 0 680 210" role="img" aria-label="Một bài đăng trên điện thoại được soi bằng kính lúp và đóng dấu đã kiểm chứng">
+   <defs><path id="ring" d="M560,105 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
+   <rect x="0" y="150" width="680" height="60" fill="#0e7469"/>
+   <g transform="translate(70 18)">
+    <rect x="0" y="0" width="170" height="200" rx="22" fill="#16181d"/>
+    <rect x="9" y="12" width="152" height="188" rx="14" fill="#fff"/>
+    <circle cx="30" cy="38" r="11" fill="#e07b00"/><rect x="48" y="30" width="70" height="7" rx="3" fill="#16181d"/><rect x="48" y="41" width="44" height="5" rx="2" fill="#9aa1ad"/>
+    <rect x="20" y="60" width="128" height="6" rx="3" fill="#626977"/><rect x="20" y="72" width="110" height="6" rx="3" fill="#626977"/><rect x="20" y="84" width="120" height="6" rx="3" fill="#626977"/>
+    <rect x="20" y="98" width="128" height="62" rx="8" fill="#ffe066"/>
+    <rect x="30" y="112" width="70" height="6" rx="3" fill="#16181d"/><rect x="30" y="124" width="96" height="6" rx="3" fill="#16181d"/><rect x="30" y="136" width="56" height="6" rx="3" fill="#16181d"/>
+   </g>
+   <g transform="translate(250 40)">
+    <circle cx="60" cy="60" r="46" fill="rgba(255,255,255,.18)" stroke="#fff" stroke-width="10"/>
+    <rect x="96" y="96" width="70" height="20" rx="10" fill="#f2c230" transform="rotate(45 96 96)"/>
+    <path d="M38 50 q22 -22 44 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>
+   </g>
+   <g transform="rotate(-14 560 105)">
+    <circle cx="560" cy="105" r="78" fill="none" stroke="#ff6b76" stroke-width="6"/>
+    <circle cx="560" cy="105" r="50" fill="none" stroke="#ff6b76" stroke-width="3"/>
+    <text font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#ff6b76" letter-spacing="3"><textPath href="#ring">ĐÃ KIỂM CHỨNG · THẨM ĐỊNH · </textPath></text>
+    <text x="560" y="114" text-anchor="middle" font-family="Be Vietnam Pro" font-weight="800" font-size="26" fill="#ff6b76">?!</text>
+   </g>
+  </svg>
+ </div>
+ <div class="col">
+  <div class="panel">
+   <h2>Năm con dấu</h2>
+   <ul class="legend">
+    <li><span class="chip" style="color:var(--c-t)">Tin đúng</span><span>Thông tin chính xác, kiểm chứng được.</span></li>
+    <li><span class="chip" style="color:var(--c-mis)">Mis</span><span>Sai, nhưng người đăng không cố ý lừa: họ tin thật, hiểu nhầm hoặc hoảng sợ.</span></li>
+    <li><span class="chip" style="color:var(--c-dis)">Dis</span><span>Sai và cố ý: bóp méo, mạo danh, bán dịch vụ, câu tương tác.</span></li>
+    <li><span class="chip" style="color:var(--c-mal)">Mal</span><span>Thông tin (có thể thật) bị đưa ra để gây hại cho một người cụ thể.</span></li>
+    <li><span class="chip" style="color:var(--c-sat)">Châm biếm</span><span>Bài đùa, nhại lại; không nhằm đưa tin.</span></li>
+   </ul>
+   <ol class="howto">
+    <li>Mỗi thẻ là một bài đăng kèm <b>nhận định cần thẩm định</b>.</li>
+    <li>Bấm <b>Tra cứu</b> để xem kết quả tìm kiếm từ báo chí, nghiên cứu, cơ quan chính thức.</li>
+    <li>Đóng đúng dấu: +2 điểm. Dấu gần đúng (khi ý định của người đăng còn tranh cãi): +1 điểm.</li>
+    <li>Hết 20 thẻ, kết quả tự gửi về Google Form của lớp.</li>
+   </ol>
+   <p class="sub" style="margin:12px 0 0">Tên tài khoản cá nhân đã được che; thông tin nhận dạng người bị nhắc đến đã bị xoá.</p>
+  </div>
+  <form class="panel" id="f" autocomplete="off">
+   <label for="teamName">Tên nhóm</label>
+   <input class="field" id="teamName" maxlength="40" placeholder="Ví dụ: Nhóm 3" required>
+   <div class="row" style="margin-top:14px">
+    <button class="btn teal" type="submit">Vào bàn kiểm chứng</button>
+    <button class="btn ghost hidden" type="button" id="resume"></button>
+   </div>
+  </form>
+ </div>
+</section>
+
+<section id="play" class="hidden">
+ <div class="bar"><div class="col"><span class="team" id="pTeam"></span><span class="clock" id="pClock">00:00</span><span class="pts" id="pPts">0 đ</span></div><div class="col dots" id="dots"></div></div>
+ <div class="col stage">
+  <p class="cardno"><span id="cNo"></span><span id="cKind"></span></p>
+  <article class="post" id="post"></article>
+  <div class="claim"><div class="k">NHẬN ĐỊNH CẦN THẨM ĐỊNH</div><p id="claim"></p></div>
+  <div class="tools"><button class="btn ghost" type="button" id="lookBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Tra cứu</button><span class="hint" id="hint">Phím tắt: 1–5 đóng dấu, T tra cứu</span></div>
+  <div class="stamps" id="stamps" role="group" aria-label="Đóng dấu cho bài này"></div>
+  <div class="verdict hidden" id="verdict" aria-live="polite">
+   <p class="vt" id="vt"></p><p id="vw"></p><ul id="vs"></ul>
+   <div class="nx"><button class="btn" type="button" id="nextBtn">Thẻ tiếp</button></div>
+  </div>
+ </div>
+</section>
+
+<section id="end" class="hidden">
+ <div class="col" style="padding-bottom:40px">
+  <div class="final">
+   <div class="kick">THẺ PHÓNG VIÊN</div>
+   <h2 id="eTeam"></h2>
+   <span class="rank" id="eRank"></span>
+   <div class="big" id="eScore"></div>
+   <div class="tiles" id="eTiles"></div>
+   <div>Mã kết quả: <span class="code" id="eCode"></span></div>
+   <div class="send" id="eSend"></div>
+   <div class="row" style="margin-top:14px">
+    <a class="btn hidden" id="eLink" href="#" target="_blank" rel="noopener">Gửi kết quả lên Google Form</a>
+    <button class="btn ghost" type="button" id="againBtn">Nhóm khác chơi</button>
+   </div>
+  </div>
+  <div class="list" id="eList"></div>
+ </div>
+</section>
+
+<div class="veil hidden" id="veil"></div>
+<div class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sq">
+ <div class="col"><div class="grab"></div>
+  <div class="sbar"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span id="sq"></span></div>
+  <div class="res" id="sres"></div>
+  <button class="btn" type="button" id="closeSheet" style="width:100%">Đóng, quay lại bài đăng</button>
+ </div>
+</div>
+
+<script>
+{
+/* ---------- cấu hình Google Form (form của game newsliteracy) ---------- */
+const FORM="https://docs.google.com/forms/d/e/1FAIpQLScs6hWIg-LNJs6TFdgRT0b0M6ENA1-JaQnddGGpRBVlOuPs2A/formResponse";
+const F={team:"entry.983351973",score:"entry.1601203130",time:"entry.932556584",code:"entry.549997770",detail:"entry.1228198398"};
+const GAME="Tin đúng – Tin sai (Threads 11/2026)";
+
+const L={t:"Tin đúng",mis:"Mis",dis:"Dis",mal:"Mal",sat:"Châm biếm"};
+const SUB={t:"chính xác",mis:"sai vô ý",dis:"sai cố ý",mal:"gây hại",sat:"đùa"};
+const COL={t:"#1f8a4c",mis:"#e07b00",dis:"#d92d3a",mal:"#6b2fbf",sat:"#1f6fd1"};
+const KEYS=["t","mis","dis","mal","sat"];
+const AV=["#0e7469","#e07b00","#6b2fbf","#1f6fd1","#d92d3a","#3d5a80","#8a5a44"];
+
+/* who: [tên hiển thị, handle đã che, phụ đề]; c: bình luận [tên, nội dung, lượt thích, trả lời?] */
+const D=[
+{kind:"Bài đăng Threads",who:["Tori","@to••••ze","77 người theo dõi · 06/11/2026"],
+ body:"Sau 1 ngày lướt threads thì t sẽ tổng hợp và tóm tắt 3 rumor đang được thảo luận nhiều nhất sau sự việc các chính phủ yêu cầu người dân tích trữ lương thực:\n1. TẬN THẾ (Thứ 6, 13/11/2026), rumor xuất phát từ 1 bài đăng vào 1/1 trên diễn đàn theqoo Hàn Quốc. Trùng hợp, một số cư dân mạng TQ phát hiện ra vào ngày đó thông tin nhiệt độ trên app thời tiết trên điện thoại của họ ở 1 số khu vực giảm xuống thất thường ở mức -31°C trong khi những ngày khác nền nhiệt đều trên 9-10°C",
+ media:{t:"wx"},acts:["8,7K","491","751","692K lượt xem"],
+ c:[["doquyen","13/11 tận thế thì 15/11 có còn đi concert được không ạ, mình hỏi cho mình =))))))","—"],["alice••","Nó sẽ đến khi mọi người không ngờ tới nhất, còn cứ rầm rộ như thế này thì sẽ chẳng có gì xảy ra đâu.","101"]],
+ claim:"Thứ Sáu <mark>13/11/2026 là ngày tận thế</mark>; dấu hiệu là ứng dụng thời tiết ở Trung Quốc báo -31°C hôm đó.",
+ q:"tận thế 13/11/2026 -31 độ app thời tiết",
+ r:[["tienphong.vn","Thực hư tin đồn thế giới sắp bước sang ngày tận thế 13/11","Mức -31°C đến -32°C xuất phát từ lỗi trên ứng dụng Thời tiết của Apple, chỉ hiện quanh 20h ngày 13/11 ở Bắc Kinh, Vũ Hán, Thượng Hải; trước và sau đó nhiệt độ bình thường. Cơ quan khí tượng Trung Quốc đã lên tiếng."],["tienphong.vn","\"Ngày tận thế hụt 13/11\": netizen người tích trữ đồ ăn, người lên dress code","Mốc 13/11/2026 bắt nguồn từ một nghiên cứu năm 1960, không phải dự báo thảm họa cụ thể. Ngày 13/11 đã khép lại, thế giới vẫn bình yên."],["Ghi chú","Đọc kỹ cả chuỗi","Ở phần cuối chuỗi, chính người tổng hợp viết rằng trong 3 tin đồn thì tin tận thế \"gần như không có khả năng nhất\" và -31°C \"là do lỗi app\"."]],
+ a:"mis",alt:[],w:"Ngày 13/11 lấy từ một mô hình dân số năm 1960. Mức -31°C là lỗi ứng dụng Thời tiết của Apple. Người tổng hợp chỉ gom tin đồn và tự ghi rằng tin này ít khả năng nhất, không có dấu hiệu cố ý lừa: mis.",
+ s:[["Tiền Phong: Thực hư tin đồn tận thế 13/11","https://tienphong.vn/thuc-hu-tin-don-the-gioi-sap-buoc-sang-ngay-tan-the-1311-post1893885.tpo"],["Tiền Phong: Ngày tận thế hụt","https://tienphong.vn/ngay-tan-the-hut-1311-netizen-nguoi-tich-tru-do-an-nguoi-len-dress-code-post1894235.tpo"]]},
+
+{kind:"Bài đăng Threads",who:["Nguyễn A.","@ed••••an","51 người theo dõi · 25/11/2026"],
+ body:"Tự dưng đọc được bài viết như này, không biết có thật không nhưng mà tui thấy sợ quá😭",
+ media:{t:"x",name:"Truth",handle:"@TENPHOENIX2018",tr:"Bản dịch từ tiếng Trung của Grok",text:"Một bé 15 tuổi ở Hợp Xuyên, Trùng Khánh không may ngã và tử vong, 6 người hiến tạng được ghép thành công.\nThật trùng hợp, đúng lúc có sáu người đã nhịn ăn 12 giờ trước ca phẫu thuật.",ft:"15:30 · 25/11/26 · 767K lượt xem",reply:"Không có bệnh thì đừng đi khám sức khỏe. Khớp rồi, bạn không còn là bệnh nhân nữa, mà là nguồn cung."},
+ acts:["4K","127","226","129K lượt xem"],
+ c:[["matcha••","X từ Trung thì nghe cho vui thôi, nó còn đồn đủ thứ khác kìa :))","59"],["summer••","Thực ra cũng k cần nhịn ăn tới 12 tiếng đâu, 6 tiếng cũng đc rồi á... Ừm nhưng mà tui vẫn tin cái thuyết âm mưu này nha.","43"]],
+ claim:"Bài trên X ám chỉ <mark>6 người nhận đã biết trước và nhịn ăn sẵn</mark> trước khi em bé gặp nạn, tức là có mổ cướp nội tạng.",
+ q:"合川 15岁 摔倒 器官捐献 6人",
+ r:[["news.sina.cn · 01/04/2023","Tiễn biệt! Thiếu niên 15 tuổi qua đời do tai nạn, hiến tạng cứu 8 người","Em Hồ Quốc Khánh (Hợp Xuyên, Trùng Khánh) ngã cầu thang ngày 25/2/2023, được chuyển lên Bệnh viện Tây Nam điều trị nhưng không qua khỏi. Gia đình hiến tim, phổi, gan, thận và hai giác mạc dưới sự chứng kiến của Hội Chữ thập đỏ Trùng Khánh."],["news.cn · 18/09/2025","Sinh mệnh tiếp nối: chàng trai 23 tuổi hiến tạng cứu 7 người","Bảy ca ghép từ cùng một người hiến được tiến hành đồng thời tại Bệnh viện Nhân dân tỉnh Tứ Xuyên."],["Ghi chú chuyên môn","Quy trình ghép tạng","Người nhận chỉ được gọi vào viện sau khi gia đình người hiến đồng ý và tạng được phân bổ; nhịn ăn trước gây mê là bước chuẩn bị của mọi ca mổ."]],
+ a:"dis",alt:["mis"],w:"Chuyện có thật nhưng xảy ra năm 2023: em ngã ngày 25/2, điều trị khoảng một tháng rồi mới hiến tạng. Bài trên X đăng ngày 25/11/2026, bỏ mốc thời gian và thêm chi tiết \"nhịn ăn\" để gợi ý mổ cướp tạng: dis. Người chia sẻ trên Threads tin thật và sợ, nên ở họ là mis (+1 điểm).",
+ s:[["Sina/Bắc Kinh Nhật báo, 1/4/2023","https://news.sina.cn/2023-04-01/detail-imynvyne7228713.d.html?vt=4"],["Tân Hoa Xã: 7 ca ghép cùng lúc","https://www.news.cn/local/20250918/5107e2706cad4cf6aa13e7afe23ab1fc/c.html"]]},
+
+{kind:"Ảnh tin được chia sẻ trên Threads",who:["Đại Việt 12","@12••qa","Ảnh đính kèm trong một bài đăng · 03/11/2026"],
+ body:"Hai thẻ tin của Tuổi Trẻ và VTV24 được chụp lại, nằm trong ảnh đính kèm của một bài đăng:",
+ media:{t:"news2"},acts:null,c:[],
+ claim:"<mark>Thái Lan kêu gọi mỗi gia đình chuẩn bị túi sinh tồn</mark> đủ dùng trong 72 giờ khẩn cấp.",
+ q:"Thái Lan túi sinh tồn 72 giờ DDPM",
+ r:[["vietnamplus.vn · 02/11/2026","Thái Lan kêu gọi mỗi gia đình chuẩn bị \"túi sinh tồn\" cho 72 giờ khẩn cấp","Ngày 2/11, Cục Phòng chống và Giảm nhẹ thiên tai (DDPM) thuộc Bộ Nội vụ Thái Lan khuyến cáo người dân chuẩn bị túi đồ khẩn cấp, với thông điệp nâng cao nhận thức, không hoảng loạn."],["cafef.vn","Vì sao Thái Lan khuyến cáo người dân chuẩn bị \"túi sinh tồn 72 giờ\"?","DDPM nhấn mạnh đây là biện pháp phòng ngừa, không phải dấu hiệu nguy cơ chiến tranh; Thái Lan không nằm trong danh sách các nước được yêu cầu chuẩn bị."],["nationthailand.com · 03/11/2026","What's in your 72-hour emergency bag? DDPM lists 6 essentials","72 giờ là mốc tham chiếu quốc tế cho giai đoạn trước khi cứu trợ của nhà nước kịp tổ chức."]],
+ a:"t",alt:[],w:"DDPM Thái Lan đưa khuyến cáo ngày 2/11/2026, kèm danh sách 6 nhóm vật dụng. Họ nói rõ đây là phòng ngừa, không phải dấu hiệu chiến tranh.",
+ s:[["VietnamPlus","https://www.vietnamplus.vn/thai-lan-keu-goi-moi-gia-dinh-chuan-bi-tui-sinh-ton-cho-72-gio-khan-cap-post1145844.vnp"],["CafeF","https://cafef.vn/vi-sao-thai-lan-khuyen-cao-nguoi-dan-chuan-bi-tui-sinh-ton-72-gio-188261105104028574.chn"]]},
+
+{kind:"Bài đăng Threads",who:["Gấu","@ga••••ii","30 người theo dõi · 11/10/2026"],
+ body:"Này !!! Chúng mày ơi.\nCái vụ mà dùng wifi của công ty là công ty đọc được hết tin nhắn của mình là có thật đấy à ?",
+ media:null,acts:["11,8K","196","215","852K lượt xem"],
+ c:[["riguang••","Xài wifi công cộng hoặc wifi riêng tư / nhà hàng / khách sạn nó hack dc ngân hàng - facebook - messenger - zalo - web - tin nhắn .... tui bị rồi, tui nói bạn tui mà tụi nó tưởng tui nói láo ko á .....","832"],["whiskey••","tuỳ nha. cty to có build firewall thì nó bắt đc hết nội dung trc khi đi ra internet.","63"],["t_uyen••","Zalo fb thì không, nhưng chat doanh nghiệp như Teams thì admin cty muốn là đc, cả outlook cty. Nhưng wifi thì không","62"]],
+ claim:"Chỉ cần <mark>dùng wifi của công ty (hay quán xá, khách sạn)</mark> là người quản lý mạng <mark>đọc được hết tin nhắn</mark> Zalo, Messenger của bạn.",
+ q:"wifi công ty có đọc được tin nhắn Zalo Messenger HTTPS",
+ r:[["quantrimang.com","Có nên sử dụng mạng Wi-Fi công cộng?","Hầu hết trang web và ứng dụng hiện nay dùng HTTPS, mã hoá thông tin truyền giữa thiết bị và máy chủ. HTTPS bảo vệ nội dung giao tiếp nhưng không che siêu dữ liệu (bạn đang truy cập trang nào)."],["vnreview.vn","Kết nối wifi miễn phí ở quán cà phê, sân bay: những rủi ro ít người để ý","Rủi ro lớn là điểm phát wifi giả mạo đặt tên giống mạng thật, và các dịch vụ không dùng kết nối bảo mật."],["Ghi chú chuyên môn","Khi nào công ty đọc được?","Khi bạn dùng máy do công ty quản lý có cài phần mềm giám sát, hoặc nhắn qua công cụ nội bộ (Teams, Outlook công ty). Chỉ kết nối wifi thì chủ mạng không xem được nội dung tin nhắn đã mã hoá."]],
+ a:"mis",alt:[],w:"Nửa đúng. Qua wifi, chủ mạng chỉ thấy bạn dùng ứng dụng, trang nào; nội dung đã được mã hoá. Công ty đọc được khi bạn dùng máy công ty có phần mềm giám sát hoặc chat qua công cụ nội bộ. Người hỏi và người bình luận đều tin thật: mis.",
+ s:[["Quản Trị Mạng","https://quantrimang.com/nhung-dieu-can-biet-khi-dung-wifi-mien-phi-133498"],["VnReview: wifi giả mạo","https://vnreview.vn/threads/ket-noi-wifi-mien-phi-o-quan-ca-phe-san-bay-nhung-rui-ro-it-nguoi-de-y.83273/latest"]]},
+
+{kind:"Bài đăng Threads",who:["Outis","@ou••••51","Tiểu sử: \"Chuyên gia thôi miên trị liệu tâm lý\" · 169 người theo dõi · 25/11/2026"],
+ body:"Tôi rất rất hạn chế nhận điều trị UT. Trong 5 năm đổ lại đây tôi chỉ nhận 3 cases, thành công 2/3, case còn lại vì đã hoá xạ trị quá nhiều nên cơ thể không trụ nổi nữa. Cũng bởi lý do tần số của bệnh nhân UT xuống rất thấp nên tôi bị hao năng lượng vô cùng, tuy vẫn có thể tái tạo liên tục, nhưng mệt mỏi là điều khó tránh.\nCàng ít can thiệp tây y, càng nhiều cơ hội sống cho bệnh nhân UT. Đó là sự thật. Bạn có quyền tin hoặc không, k ảnh hưởng gì tới tôi.",
+ media:null,acts:["98","17","4","8,4K lượt xem"],
+ c:[["thiennguyen••","Tôi có thắc mắc nhỏ là sao bạn lại dùng năng lượng dự trữ của chính bạn, thay vì bạn chỉ là kênh dẫn năng lượng vũ trụ xuống để chuyển sang người bệnh chứ nhỉ?","5"],["Outis","về lý thuyết là vậy, các bệnh thông thường làm vậy rất đơn giản, nhưng thực tế 1 case UT không đơn giản như thế bạn ạ","6",1]],
+ claim:"<mark>Càng ít can thiệp Tây y</mark> (hoá trị, xạ trị), bệnh nhân ung thư <mark>càng có nhiều cơ hội sống</mark>.",
+ q:"liệu pháp thay thế ung thư tỷ lệ tử vong nghiên cứu",
+ r:[["medicine.yale.edu","Finally, data about alternative medicine and cancer","Nghiên cứu của Đại học Yale (JNCI) trên dữ liệu ung thư quốc gia Mỹ: bệnh nhân chọn liệu pháp chưa được chứng minh thay cho điều trị chuẩn có nguy cơ tử vong trong khoảng 5,5 năm cao gấp 2,5 lần; với ung thư vú cao gần 6 lần."],["Ghi chú","Ai đang nói?","Tài khoản tự giới thiệu là chuyên gia thôi miên trị liệu, đang mô tả dịch vụ chữa ung thư \"bằng năng lượng\" của chính mình, không dẫn bằng chứng nào."]],
+ a:"dis",alt:[],w:"Người đăng quảng bá dịch vụ của chính mình, khẳng định \"đó là sự thật\" không dẫn chứng, đổ lỗi ca tử vong cho hoá xạ trị. Bằng chứng nghiên cứu cho thấy điều ngược lại: dis.",
+ s:[["Yale Medicine","https://medicine.yale.edu/news-article/finally-data-about-alternative-medicine-and-cancer"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài tổng hợp tin đồn \"tận thế 13/11/2026\" (692K lượt xem)",who:["Nam D.","@na••••44","06/11/2026"],
+ body:"Cái vụ 13/11 là tận thế xuất phát từ một nghiên cứu về dân số từ những năm 60s. Nghiên cứu này sử dụng một MÔ HÌNH TOÁN HỌC và mô hình này cho ra dự đoán là dân số thế giới sẽ đạt vô cực vào ngày 13/11/2026 (tận thế).",
+ media:null,acts:["162","3","2","—"],c:[],
+ claim:"Mốc 13/11/2026 bắt nguồn từ <mark>một nghiên cứu dân số năm 1960</mark>, có mô hình toán cho kết quả dân số tiến tới vô cực vào ngày đó.",
+ q:"Doomsday Friday 13 November 2026 Science 1960",
+ r:[["gizmodo.com / The Conversation","Scientists once calculated the date of doomsday, and it's next month","Năm 1960, tạp chí Science đăng bài \"Doomsday: Friday, 13 November, A.D. 2026\". Tỷ lệ sinh toàn cầu nay chỉ còn khoảng một nửa so với 1960."],["iflscience.com","An old paper really did suggest a mathematical doomsday on 13 November 2026","Bài của Heinz von Foerster và hai cộng sự; ngày 13/11 nhiều khả năng được chọn vì là sinh nhật von Foerster."],["time.com (lưu trữ)","Science: Doomsday in 2026 A.D.","Bản thân von Foerster không thật sự tin loài người sẽ sinh sôi đến vô hạn."]],
+ a:"t",alt:[],w:"Đúng: bài \"Doomsday: Friday, 13 November, A.D. 2026\" của Heinz von Foerster, Patricia Mora và Lawrence Amiot đăng trên Science năm 1960. Đó là phép ngoại suy tốc độ tăng dân số, không phải lời tiên tri.",
+ s:[["Gizmodo/The Conversation","https://gizmodo.com/scientists-once-calculated-the-date-of-doomsday-and-its-next-month-2000820261"],["IFLScience","https://www.iflscience.com/an-old-paper-really-did-suggest-a-mathematical-doomsday-on-13-november-2026-but-theres-no-need-to-worry-84777"]]},
+
+{kind:"Bài đăng Threads",who:["Tài khoản ẩn danh","@ba••••27","Không ảnh đại diện · 23 người theo dõi · 26/11/2026"],
+ body:"Disclaimer: không ghen tị phụ nữ thành đạt.\nNma bà này tai tiếng trong giới academic lắm, học PhD xong bị đuổi, nhận bằng master. Bị phản ánh rất nhiều về tác phong làm việc từ những người quen biết. Suốt ngày lên các group học tập phát ngôn linh tinh để lùa gà mentor du học.\nGiới học thuật nó ngộ lắm, nhân tài thì ẩn dật, ngại khoe, người hay khoe thì phần lớn có mục đích.",
+ media:{t:"qp",text:"hết mạt sát phụ nữ tài giỏi độc thân, chúng tôi chuyển mục tiêu qua phụ nữ tài giỏi làm việc và sinh sống ngoài nước",cap:"Ảnh chụp bài khoe thành tích của một phụ nữ làm mentor du học ở Mỹ (đã che)"},
+ acts:["375","38","14","26,8K lượt xem sau 1 giờ"],
+ c:[["tuyet••","<span class=\"redact\">Họ tên đầy đủ</span> phải không tar? Trời ơi, bà này cựu sv trường <span class=\"redact\">tên trường</span> cùng khoa, khoá trên với mình nè. Bà này phông bạt thôi các bác.","45"],["elk••","chấm xin info","—"],["badger (tác giả)","300 mentee kia chắc chị nhận vơ quá nửa, nhiều bài phốt rồi mn tự tìm lại xem :v","27",1]],
+ claim:"Bài viết và phần bình luận nói về <mark>một người phụ nữ cụ thể</mark>: bị đuổi khỏi chương trình tiến sĩ, tác phong kém, nhận vơ học trò; kèm <mark>họ tên và trường cũ</mark> của cô.",
+ q:"rời chương trình tiến sĩ nhận bằng thạc sĩ Mỹ",
+ r:[["Ghi chú","Những gì tra được","Không có nguồn độc lập nào xác nhận các cáo buộc; tác giả chỉ dựa vào \"người quen phản ánh\" và bảo người đọc \"tự tìm\". Ở Mỹ, rời chương trình tiến sĩ với bằng thạc sĩ khá phổ biến và có nhiều lý do, không nhất thiết là bị đuổi."],["rm.coe.int · Hội đồng châu Âu, 2017","Information Disorder: Toward an interdisciplinary framework","Malinformation: thông tin (thật) được chia sẻ để gây hại, thường bằng cách đưa thông tin vốn riêng tư ra công khai."]],
+ a:"mal",alt:[],w:"Các cáo buộc không kiểm chứng được, nhưng điều quyết định là mục đích: hạ uy tín một cá nhân cụ thể, và phần bình luận đưa họ tên, trường cũ của người đó ra công khai. Mal không cần tin sai.",
+ s:[["Council of Europe, Information Disorder (2017)","https://rm.coe.int/information-disorder-toward-an-interdisciplinary-framework-for-researc/168076277c"]]},
+
+{kind:"Bài đăng Threads",who:["Đại Việt 12","@12••qa","Tiểu sử: \"nói sự thật và trình bày ý tưởng mới\" · 290 người theo dõi · 03/11/2026"],
+ body:"báo Tuổi Trẻ ghi đích danh ra luôn. Còn ở Việt Nam đã cảnh báo từ trước đó một tháng rưỡi.\nngày 7 tháng 11 sẽ làm mốc.",
+ media:{t:"combo"},acts:["5,3K","138","188","726K lượt xem"],
+ c:[["morning••","Xăng mới hạ còn 23k, xin đừng choảng nhau xin đừng đánh nhau","330"],["frank••","Các nước đã làm quá. Nhiều trang tin về extraterrestrials nói UFO sẽ lần đầu xuất hiện công khai trong tháng 11...","66"]],
+ claim:"Khuyến cáo túi sinh tồn của Thái Lan và phát biểu của Thủ tướng Việt Nam <mark>cùng báo hiệu một biến cố lớn</mark>, với <mark>ngày 7/11 là mốc</mark>.",
+ q:"Thủ tướng Học viện Quốc phòng tình huống chưa có tiền lệ 15/9/2026",
+ r:[["tienphong.vn","Thủ tướng Lê Minh Hưng: Chuẩn bị đội ngũ cán bộ đủ năng lực cho hiện tại và tương lai","Sáng 15/9/2026, Thủ tướng dự lễ khai giảng năm học 2026–2027 của Học viện Quốc phòng; bài phát biểu nói về đào tạo cán bộ, tư duy chiến lược, chuyển đổi số."],["vietnamplus.vn · 02/11/2026","Thái Lan kêu gọi mỗi gia đình chuẩn bị \"túi sinh tồn\" cho 72 giờ khẩn cấp","Khuyến cáo phòng ngừa thiên tai và sự cố, ra ngày 2/11/2026."],["Ghi chú","Đối chiếu ngày","Hai tin cách nhau hơn một tháng rưỡi; không văn bản nào nhắc ngày 7/11."]],
+ a:"mis",alt:["dis"],w:"Hai tin đều thật nhưng không liên quan: lễ khai giảng ngày 15/9 và khuyến cáo phòng ngừa ngày 2/11. Ghép hai tin thật rồi tự đặt mốc 7/11 là \"kết nối sai\". Chọn mis vì người đăng có vẻ tin thật; dis được 1 điểm, lớp có thể tranh luận.",
+ s:[["Tiền Phong","https://tienphong.vn/thu-tuong-le-minh-hung-du-khai-giang-nam-hoc-moi-tai-hoc-vien-quoc-phong-post1876475.tpo"],["VietnamPlus","https://www.vietnamplus.vn/thai-lan-keu-goi-moi-gia-dinh-chuan-bi-tui-sinh-ton-cho-72-gio-khan-cap-post1145844.vnp"]]},
+
+{kind:"Bài báo",who:["Bắc Kinh Nhật báo","news.sina.cn","Đăng lại trên Sina · 01/04/2023"],news:true,
+ body:"Tiễn biệt! Thiếu niên 15 tuổi qua đời do tai nạn, hiến tạng cứu 8 người.\nEm là học sinh lớp 9 ở quận Hợp Xuyên, Trùng Khánh. Ngày 25/2, em ngã khi đi xuống cầu thang ở nhà. Sau khi được mổ ở bệnh viện địa phương, em vẫn hôn mê và được chuyển lên Bệnh viện Tây Nam (Đại học Quân y Lục quân). Bệnh viện hội chẩn nhiều chuyên khoa nhưng không cứu được em.",
+ media:null,acts:null,c:[],
+ claim:"Một nam sinh 15 tuổi ở Hợp Xuyên, Trùng Khánh ngã cầu thang, không qua khỏi; gia đình <mark>hiến tạng cứu 6 người suy tạng và giúp 2 người sáng mắt</mark>.",
+ q:"胡国庆 合川 器官捐献 西南医院",
+ r:[["news.sina.cn · 01/04/2023","送别！15岁少年意外离世捐器官救8人","Em Hồ Quốc Khánh hiến tim, phổi, gan, thận và hai giác mạc dưới sự chứng kiến của Hội Chữ thập đỏ Trùng Khánh; số tạng này giúp 6 bệnh nhân suy tạng và 2 người mù."],["thecover.cn","15 tuổi hiến tạng, thực hiện \"giấc mơ nhập ngũ\"","Bài phỏng vấn gia đình: cha em kể em mơ ước đi bộ đội; anh trai em đang chữa suy thận."]],
+ a:"t",alt:[],w:"Đúng, nhưng là tin tháng 4/2023. Hãy để ý ngày đăng: một tin thật có thể bị lấy lại ba năm sau với nội dung khác (xem thẻ 2).",
+ s:[["Sina/Bắc Kinh Nhật báo","https://news.sina.cn/2023-04-01/detail-imynvyne7228713.d.html?vt=4"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Wade","@wa••••od","13/11/2026"],
+ body:"Nếu ráy tai ướt tự nhiên khả năng cao là bạn sẽ bị HÁCH NÔI (do bạn có gen ABCC11), còn nếu ráy tai khô tự nhiên thì không bị nhé",
+ media:null,acts:["4,3K","84","55","—"],
+ c:[["hi.t••","1 bên ướt 1 bên khô thì hôi 1 bên thôi đúng k ạ","533"],["totrinh••","Với 1 đứa ráy ướt và phải vệ sinh tai hằng ngày thì t xác nhận là nách t rất dễ có mùi...","1,2K"]],
+ claim:"Người có <mark>ráy tai ướt</mark> dễ bị <mark>hôi nách</mark> hơn người có ráy tai khô, do <mark>gen ABCC11</mark>.",
+ q:"ABCC11 wet earwax axillary odor",
+ r:[["pubmed.ncbi.nlm.nih.gov · BMC Genetics 2009","A strong association of axillary osmidrosis with the wet earwax type determined by genotyping of the ABCC11 gene","Một đột biến điểm (SNP rs17822931) trên gen ABCC11 quyết định kiểu ráy tai. Nghiên cứu trên người Nhật cho thấy liên hệ rất mạnh giữa hôi nách và kiểu gen ráy tai ướt."],["the-scientist.com","How are earwax and body odor linked?","Năm 2006, các nhà khoa học xác định gen ABCC11; một thay đổi G thành A quyết định ráy tai ướt hay khô, và cũng ảnh hưởng mùi cơ thể."]],
+ a:"t",alt:[],w:"Đúng. Gen ABCC11 quyết định cả kiểu ráy tai lẫn một phần mùi nách. \"Khả năng cao\" là cách nói hợp lý; mùi còn phụ thuộc vệ sinh và vi khuẩn trên da.",
+ s:[["BMC Genetics 2009 (PubMed)","https://pubmed.ncbi.nlm.nih.gov/19650936/"],["The Scientist","https://www.the-scientist.com/how-are-earwax-and-body-odor-linked-72476"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Gazelle","@ga••••30","13/11/2026"],
+ body:"lưỡi không cảm nhận được \"vị cay\", cái sự cay 🥵 mà mọi người đề cập là do lưỡi đang bị đau",
+ media:null,acts:["1,1K","5","4","—"],c:[],
+ claim:"<mark>Cay không phải là một vị</mark>; cảm giác cay thực chất là <mark>cảm giác đau</mark>.",
+ q:"cay có phải vị không capsaicin TRPV1",
+ r:[["sciencefocus.hkust.edu.hk","Understand Spiciness: A Pain but Not a Taste","Capsaicin trong ớt không đi vào nụ vị giác mà gắn vào thụ thể đau TRPV1, vốn dùng để báo nhiệt độ trên 43°C."],["pmc.ncbi.nlm.nih.gov","Siebert và cộng sự, 2022","Cảm giác cay từ capsaicin không phải vị mà là chất kích thích được nhận biết qua đường dẫn truyền đau."],["Ghi chú","Giải Nobel 2021","David Julius nhận Nobel Y học 2021 nhờ phát hiện thụ thể TRPV1."]],
+ a:"t",alt:[],w:"Đúng. Năm vị cơ bản là ngọt, mặn, chua, đắng, umami. Cay là tín hiệu từ thụ thể đau và nhiệt TRPV1.",
+ s:[["HKUST Science Focus","https://sciencefocus.hkust.edu.hk/node/125"],["Siebert và cộng sự (PMC)","https://pmc.ncbi.nlm.nih.gov/articles/PMC9795841"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Gi Hoa","@gi••••38","13/11/2026"],
+ body:"4. Gen của mình luôn muốn tiến hoá tốt hơn nên nó sẽ tự chọn những thứ cơ thể không có. Vd người ít tóc thích người nhiều tóc, lùn thích cao\n5. Ngón cái chạm đầu ngón áp út cả hai bàn tay thì hít thở chỉ đến lồng ngực...\n6. Móng tay có hình bán nguyệt màu trắng ở gốc càng nhiều thì sinh lý càng tốt (có thể thay đổi liên tục)",
+ media:null,acts:["3,3K","15","42","—"],
+ c:[["for.t••","Cái fact số 1 t thường ngửi để test người khác xem có thích mình không... t đã thử nhiều người và cảm thấy khá đúng ây","677"]],
+ claim:"Móng tay có <mark>hình bán nguyệt trắng ở gốc càng nhiều</mark> thì <mark>\"sinh lý càng tốt\"</mark>.",
+ q:"lunula half moon nails meaning",
+ r:[["goodrx.com","No lunula on nails: what it means","Lunula là phần nhìn thấy của mầm móng. Không thấy lunula có thể do gen, tuổi, độ dày móng hoặc da quanh móng che mất."],["health.clevelandclinic.org","What the half-moon on your nails means","Không thấy lunula thường không đáng lo. Chỉ khi màu hoặc kích thước đổi rõ rệt kèm triệu chứng khác mới nên đi khám."]],
+ a:"mis",alt:[],w:"Sai. Kích thước lunula phụ thuộc gen, tuổi, cấu trúc móng; không có bằng chứng liên quan đến \"sinh lý\". Danh sách này trộn nhiều \"fact\" không nguồn, người viết có vẻ tin thật: mis.",
+ s:[["GoodRx","https://www.goodrx.com/health-topic/dermatology/no-lunula-on-nails"],["Cleveland Clinic","https://health.clevelandclinic.org/half-moon-nails"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài hỏi \"funfacts về cơ thể người\" (1,2 triệu lượt xem)",who:["Dino","@di••••36","12/11/2026"],
+ body:"1. Não k có dây thần kinh đau, tức là bạn có thể vừa phẫu thuật não vừa chơi nhạc cụ bthg mà k đau (thực tế là có ng làm thế rồi:))\n2. Sức mạnh cơ bắp luôn bị giới hạn để tránh gây tổn thương...\n3. Bạn có thể sống tốt khi mất 80% gan, 1 bên phổi và 1 quả thận",
+ media:null,acts:["5,7K","14","70","—"],
+ c:[["tranq••","Cái số 3 chỉ là sống sót thôi chứ không phải sống tốt","2,9K"]],
+ claim:"(Ý 1) <mark>Não không cảm nhận được đau</mark>, nên có người <mark>vừa được mổ não vừa chơi nhạc cụ</mark>.",
+ q:"awake brain surgery violin no pain receptors",
+ r:[["smithsonianmag.com","Watch a musician play violin during brain surgery","Năm 2020, nghệ sĩ Dagmar Turner kéo violin khi được mổ lấy khối u ở King's College Hospital. Não không cảm thấy đau, bác sĩ gây tê phần mô xung quanh."],["advisory.com","Brain surgery","Vì não không có thụ thể đau, bác sĩ chỉ cần gây tê da, cơ và màng quanh não; \"vào đến não thì không còn đau\"."]],
+ a:"t",alt:[],w:"Đúng với ý 1: mổ não khi tỉnh (awake craniotomy) là kỹ thuật có thật, giúp bác sĩ giữ các vùng điều khiển vận động, ngôn ngữ. (Ý 3 thì phóng đại, như bình luận đã chỉ ra.)",
+ s:[["Smithsonian","https://www.smithsonianmag.com/smart-news/watch-musician-play-violin-during-brain-surgery-180974246/"],["Advisory Board","https://www.advisory.com/Daily-Briefing/2019/01/09/brain-surgery"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài \"Topic: Những fact thú vị về những quốc gia mà bạn biết\" (543K lượt xem)",who:["Đạt","@da••hn","22/11/2026"],
+ body:"Jollibee, C2, Oishi đến từ Philippines",
+ media:null,acts:["2,7K","12","21","—"],
+ c:[["tuilac••","Mình cứ mặc định Oishii là của Nhật =))))))","969"],["_trnh••","Á đù tưởng Oishi của Nhật :)))","570"]],
+ claim:"Gà rán <mark>Jollibee</mark>, trà <mark>C2</mark> và snack <mark>Oishi</mark> đều là thương hiệu gốc Philippines.",
+ q:"Oishi brand origin Liwayway C2 Universal Robina",
+ r:[["wikipedia.com","Jollibee Foods Corporation","Công ty đa quốc gia của Philippines, trụ sở ở Pasig, Metro Manila."],["urc.com.ph","Delightful facts about URC's classic snacks","Universal Robina (Philippines) cho biết C2 có nhiều người hâm mộ ở Đông Nam Á, đặc biệt phổ biến ở Việt Nam."],["brandwiki.lazada.com.ph","About Oishi","Oishi thuộc Liwayway Marketing Corporation (Philippines), ra mắt năm 1974 với công nghệ làm snack của Nhật."]],
+ a:"t",alt:[],w:"Đúng cả ba. Oishi có tên nghe như tiếng Nhật vì ra đời năm 1974 với công nghệ Nhật, nhưng công ty mẹ Liwayway là của Philippines.",
+ s:[["URC","https://www.urc.com.ph/stories/life-fun/delightful-facts-about-urc-s-classic-snacks"],["Lazada Brand Wiki: Oishi","https://brandwiki.lazada.com.ph/oishi/"],["Wikipedia: Jollibee Foods","https://wikipedia.com/wiki/Jollibee_Foods_Corporation"]]},
+
+{kind:"Bình luận trên Threads",parent:"Trả lời bài \"Topic: Những fact thú vị về những quốc gia mà bạn biết\" (543K lượt xem)",who:["Hush","@_si••••sh","22/11/2026"],
+ body:"Singapore có luật cấm buôn bán và tiêu thụ kẹo cao su tại nước họ",
+ media:null,acts:["452","2","1","—"],c:[],
+ claim:"Ở Singapore, <mark>bán</mark> kẹo cao su và cả <mark>nhai kẹo cao su</mark> đều phạm luật.",
+ q:"Singapore chewing gum ban is chewing illegal",
+ r:[["nowboarding.changiairport.com","Unusual laws in Singapore","Theo Đạo luật Quản lý Xuất nhập khẩu, việc nhập khẩu và bán kẹo cao su bị cấm, không phải việc nhai kẹo."],["wikipedia.org","Chewing gum sales ban in Singapore","Bán kẹo cao su bị cấm từ năm 1992. Nhai kẹo không phạm luật; kẹo cao su dùng cho mục đích y tế được bán qua dược sĩ, nha sĩ."]],
+ a:"mis",alt:[],w:"Nửa đúng. Singapore cấm nhập khẩu và bán kẹo cao su từ 1992, nhưng nhai thì không phạm luật. Hiểu nhầm phổ biến, người viết tin thật: mis.",
+ s:[["Changi Airport","https://nowboarding.changiairport.com/live-local/Unusual-laws-in-Singapore.html"],["Wikipedia","https://en.wikipedia.org/wiki/Chewing_gum_sales_ban_in_Singapore"]]},
+
+{kind:"Bài đăng Threads",who:["Đức A.","@du••••nh","Tiểu sử: \"Chuyên viên cung cấp phòng trọ\" · 84 người theo dõi · 22/07/2026"],
+ body:"Góc thắc mắc: mấy bài viết như này là thật hay lừa đảo thread vậy anh em?",
+ media:{t:"salary"},acts:["584","66","8","168K lượt xem"],
+ c:[["_banh••","ùa, chúng nó là một tổ chức lun, đứa này up bài mấy đứa kia dô seeding","182"],["taolao••","Lừa, câu tương tác, gài mn nhập mã người mới để chúng nó được chia hoa hồng","35"],["tokut••","ê tui lỡ nhập theo mã rồi sao g..","2",1]],
+ claim:"Học sinh có thể <mark>nhận \"lương Threads\" mỗi ngày</mark> như ảnh biến động số dư trong bài.",
+ q:"nhận lương Threads 1 triệu mỗi ngày có thật không",
+ r:[["vnreview.vn","Sự thật về chiêu trò \"nhận lương Threads\" 1 triệu mỗi ngày","Đây không phải tính năng trả thưởng của Meta. Khoản tiền đến từ chương trình \"giới thiệu bạn bè\" của các ứng dụng ngân hàng số; người đăng gọi đó là \"lương\" để dụ người khác nhập mã giới thiệu."],["Ghi chú","Nội dung chuyển khoản","Dòng \"THREADS TRA LUONG\" là nội dung chuyển khoản, người chuyển gõ gì cũng được, không chứng minh tiền đến từ Threads."]],
+ a:"dis",alt:[],w:"Meta không trả \"lương\" kiểu này. Ảnh số dư là mồi để người xem nhập mã giới thiệu ngân hàng, người đăng hưởng hoa hồng: cố ý đánh tráo khái niệm, dis.",
+ s:[["VnReview: sự thật về chiêu nhận lương Threads","https://vnreview.vn/threads/su-that-ve-chieu-tro-nhan-luong-threads-1-trieu-moi-ngay.81555/latest"]]},
+
+{kind:"Bài đăng Threads",who:["Cỏ","@hc••••a_","4 người theo dõi · 06/10/2026"],
+ body:"Ôi cái này phải lừa đảo ko. Mình đi khám được hai hôm thì có người nhắn thế này:)))",
+ media:{t:"zalo"},acts:["3,4K","177","11","733K lượt xem"],
+ c:[["ngoc_a••","Không biết bsi của mình hả b 🥲 Nhiều khi bsi phát hiện ra cgi họ tìm b á. Chuyện bth","630"],["Cỏ (tác giả)","Nhưng bác trước khám cho mình là một bác trung niên bạn ạ🥹. Mà nick đó cũng chỉ có ảnh đại diện để hình phong cảnh thui.","373",1],["bbongj••","T kbt có phải lừa k nhưng cái ông này cũng gửi kb cho t với cùng 1 tin nhắn. Vấn đề là tháng trước t k đi khám ở đâu cả😇","504"],["Cỏ (tác giả)","Nó đổi tên r cả nhà ơi😞","166"]],
+ claim:"Người gửi lời mời kết bạn Zalo là <mark>bác sĩ đã khám cho chủ bài viết</mark>, muốn hỏi thêm về bệnh.",
+ q:"mạo danh bác sĩ bệnh viện kết bạn Zalo lừa đảo",
+ r:[["lsvn.vn","Cảnh giác chiêu lừa mạo danh nhân viên bệnh viện để bán sữa, vay tiền","Để tạo lòng tin, kẻ lừa đảo còn gửi cả dữ liệu khám chữa bệnh BHYT của người bệnh qua Zalo, Facebook."],["cafef.vn","Bệnh viện Bạch Mai cảnh báo lừa đảo","Người dân được \"nhân viên\" kết bạn Zalo để xác nhận lịch khám rồi bị yêu cầu chuyển tiền; đến viện mới biết mình không có tên trong hệ thống."]],
+ a:"dis",alt:[],w:"Một người khác nhận đúng tin nhắn này dù không đi khám, tài khoản dùng ảnh phong cảnh và đổi tên: đây là mạo danh bác sĩ, rải tin hàng loạt. Mạo danh là cố ý lừa: dis.",
+ s:[["LSVN: mạo danh nhân viên bệnh viện","https://lsvn.vn/canh-giac-chieu-lua-mao-danh-nhan-vien-benh-vien-de-ban-sua-vay-tien-1697614592-a136521.html"],["CafeF: Bệnh viện Bạch Mai cảnh báo","https://cafef.vn/benh-vien-bach-mai-canh-bao-lua-dao-18825022816551166.chn"]]},
+
+{kind:"Bài đăng Threads",who:["Quốc T.","@mr••••ay","Tiểu sử: \"Gym & Boxing\" · 1.719 người theo dõi · 07/09/2024"],
+ body:"Fact:\n\"Những người bạn có thể biết\" trên facebook chính là những người đã vào stalk fb của bạn. 🤞🏻",
+ media:{t:"fb"},acts:["1,3K","81","51","77K lượt xem"],
+ c:[["1.thang••","Ô thế á, èo toàn sếp t, mai chặn luôn","1"],["ii.io••","Ko phải, là người mình đi stalk đúng hơn, t hay đi stalk và hôm sau thấy gợi ý luôn","110"],["lea.n••","Không hẳn, cũng có thể chỉ là gợi ý bạn bè chung hoặc là người chung group nào đó thôi.","17"]],
+ claim:"Danh sách <mark>\"Những người bạn có thể biết\"</mark> trên Facebook chính là <mark>những người đã xem trang cá nhân của bạn</mark>.",
+ q:"Facebook People You May Know profile views",
+ r:[["businessinsider.in","Facebook says it doesn't use location data to suggest friends","Facebook cho biết gợi ý \"Những người bạn có thể biết\" dựa trên bạn chung, thông tin nơi học, nơi làm, nhóm tham gia, danh bạ đã tải lên và các yếu tố khác."],["transparency.meta.com","Facebook People You May Know AI system","Hệ thống chấm điểm mỗi hồ sơ theo khả năng bạn sẽ tương tác, rồi sắp xếp gợi ý."],["Ghi chú","Facebook có cho xem ai ghé trang mình không?","Không. Facebook không có tính năng xem ai đã vào trang cá nhân của bạn."]],
+ a:"mis",alt:[],w:"Sai: gợi ý chủ yếu dựa vào bạn chung, nơi học, nơi làm, danh bạ. Người đăng gọi là \"fact\" một phỏng đoán phổ biến, có vẻ tin thật: mis.",
+ s:[["Business Insider","https://www.businessinsider.in/facebook-made-a-huge-u-turn-and-says-it-doesnt-use-location-data-to-suggest-friends-after-all/articleshow/52972545.cms"],["Meta Transparency","https://transparency.meta.com/features/explaining-ranking/fb-people-you-may-know/"]]},
+
+{kind:"Bài đăng Threads",who:["Thanh H.","@hu••••99","Tiểu sử: dịch vụ du lịch, đổi ngoại tệ · 110 người theo dõi · 08/08/2026"],
+ body:"❌GÓC BÓC PHỐT BẠN Ở GHÉP ❌\n<span class=\"redact\">HỌ VÀ TÊN ĐẦY ĐỦ</span>\n- Ai quen biết con này thì kêu b ý thanh toán tiền nhà cho em nhé, ở tiền nhà không muốn đóng, 3 tháng trả được 1tr5, đồ cá nhân của t cũng tự ý lấy dùng... đồ ăn vặt t mua cũng bị nó chén hết...\n- Thường xuyên dắt bạn về ban đêm mặc dù chủ nhà căn dặn không được phép.",
+ media:{t:"blurphotos"},acts:["16,7K","1,9K","554","2,7 triệu lượt xem · 10,1K chia sẻ"],
+ c:[["Thanh H. (tác giả)","Tìm ra được Insta của nó, và rất bất ngờ, quần áo nó mặc cái nào cũng là của toy.","1,8K",1],["boar••","có link không bà","190"],["ndqn••","Khiếp thế =))) hãm đến thế là cùng","786"]],
+ claim:"Một cô gái ở ghép <mark>nợ tiền nhà, tự ý dùng đồ của bạn cùng phòng</mark>; bài đăng nêu <mark>họ tên thật và Instagram</mark> của cô.",
+ q:"đăng thông tin cá nhân người khác lên mạng bóc phốt",
+ r:[["Ghi chú","Những gì tra được","Không có nguồn độc lập nào; câu chuyện chỉ từ một phía. Người bị nêu tên là một cá nhân bình thường, không phải người của công chúng."],["rm.coe.int · Hội đồng châu Âu, 2017","Information Disorder","Malinformation: thông tin thật được chia sẻ để gây hại, thường bằng cách đưa thông tin vốn riêng tư ra công khai."]],
+ a:"mal",alt:[],w:"Dù chuyện kể có thật, bài đưa họ tên, Instagram của một người bình thường ra trước 2,7 triệu lượt xem để bêu xấu, và bình luận còn đi tìm link: đúng kiểu mal. So với thẻ 7: mal không cần tin sai.",
+ s:[["Council of Europe, Information Disorder (2017)","https://rm.coe.int/information-disorder-toward-an-interdisciplinary-framework-for-researc/168076277c"]]},
+
+{kind:"Bài đăng Threads",who:["lenl","@lo••••ly","386 người theo dõi · 06/05/2026"],
+ body:"Mình vô tình lướt trúng Instagram của bạn gái anh Khoai Lang Thang, nhìn như người bình thường (không phải người trong showbiz) =)) rồi khi tui vào stalk thì kiểu bị đơ luôn, không hiểu sao lại có nút \"chỉnh sửa trang cá nhân\"",
+ media:{t:"ig"},acts:["4K","126","311","312K lượt xem"],
+ c:[["claris••","Là bà nằm mơ dữ hen bà nội, nhiều bà mơ giống z lắm á coi chừng đụng hàng nha :))","455"],["keira••","Đừng có thấy tui dễ tin ng rồi muốn nói gì nói nghe","123"],["heal••","Mình vô tình lướt trúng Instagram của bạn gái anh Eom Seonghyeon, nhìn như người bình thường... không hiểu sao lại có nút \"chỉnh sửa trang cá nhân\"","4"]],
+ claim:"Người đăng đã <mark>tìm ra Instagram của bạn gái</mark> một vlogger nổi tiếng.",
+ q:"nút chỉnh sửa trang cá nhân Instagram hiện khi nào",
+ r:[["Ghi chú","Nút \"Chỉnh sửa trang cá nhân\"","Instagram chỉ hiện nút này khi bạn đang xem trang của chính mình."],["Ghi chú","Trích dẫn bài viết","Nhiều tài khoản chép y nguyên câu này, chỉ thay tên người nổi tiếng (Eom Seonghyeon, Thôi Lập Vu...): đây là một trend đùa."],["rm.coe.int · Hội đồng châu Âu, 2017","Information Disorder","Châm biếm, nhại lại là loại nội dung ít gây hại nhất: không nhằm lừa, nhưng vẫn có thể khiến người đọc tin thật."]],
+ a:"sat",alt:[],w:"Châm biếm: \"nút chỉnh sửa trang cá nhân\" nghĩa là người đăng đang xem trang của chính mình, tức tự nhận là bạn gái. Vẫn có người tưởng thật; khi bị chụp lại và mất bối cảnh, bài đùa có thể thành mis.",
+ s:[["Council of Europe, Information Disorder (2017)","https://rm.coe.int/information-disorder-toward-an-interdisciplinary-framework-for-researc/168076277c"]]}
+];
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ini=n=>esc(String(n).replace(/[^A-Za-zÀ-ỹĐđ0-9]/g,"").slice(0,1).toUpperCase()||"?");
+const ICON={heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',cmt:'<path d="M20 12a8 8 0 1 1-3.2-6.4L20 4l-.8 4A8 8 0 0 1 20 12z"/>',rep:'<path d="M4 9h12l-3-3M20 15H8l3 3"/>',send:'<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>'};
+const ic=k=>`<svg viewBox="0 0 24 24">${ICON[k]}</svg>`;
+const KEY="tdts-thao-v2";
+let st=null,tick=null;
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||"null");return v&&Array.isArray(v.picks)&&v.team?v:null}catch(e){return null}}
+function wipe(){try{localStorage.removeItem(KEY)}catch(e){}}
+const pts=(i,p)=>!p?0:p===D[i].a?2:D[i].alt.includes(p)?1:0;
+const total=()=>st.picks.reduce((s,p,i)=>s+pts(i,p),0);
+const secs=()=>Math.round(((st.end||Date.now())-st.t0)/1000);
+const mmss=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+function show(id){for(const s of ["start","play","end"])$(s).classList.toggle("hidden",s!==id);window.scrollTo(0,0)}
+
+/* ---------- ảnh đính kèm ---------- */
+function media(m){
+ if(!m)return"";
+ if(m.t==="wx")return `<div class="media shot wx"><div class="city">Bắc Kinh · Thời tiết</div><div class="sub" style="color:#dfe6f5">Thứ Sáu, 13/11 · ảnh chụp màn hình được lan truyền</div><div class="hours"><div>17:00<b>10°</b></div><div>18:00<b>9°</b></div><div>19:00<b>9°</b></div><div class="odd">20:00<b>-31°</b></div><div>21:00<b>9°</b></div></div></div>`;
+ if(m.t==="x")return `<div class="media shot x"><div class="h"><span class="ava sm" style="background:#fff;color:#000">✝</span><b>${esc(m.name)}</b><span class="name"><span class="tick">✓</span></span><span>${esc(m.handle)}</span></div><div class="tr">${esc(m.tr)}</div><div style="white-space:pre-line">${esc(m.text)}</div><div class="ft">${esc(m.ft)}</div><hr><div class="tr">Trả lời · ${esc(m.handle)}</div><div>${esc(m.reply)}</div></div>`;
+ if(m.t==="news2")return `<div class="media shot newsc"><div class="nc"><small>TUỔI TRẺ</small>Thái Lan kêu gọi người dân chuẩn bị "túi sinh tồn" 72 giờ giữa căng thẳng Trung Đông</div><div class="nc vtv"><small>VTV24</small>Thái Lan kêu gọi mỗi gia đình chuẩn bị "túi sinh tồn" đủ dùng trong 72 giờ khẩn cấp</div></div>`;
+ if(m.t==="combo")return `<div class="media shot"><div class="x"><div class="h"><span class="ava sm" style="background:#1f6fd1">L</span><b>Tài khoản X</b><span>@ng••••c1 · 2h</span></div><div>Chuẩn bị có biến lớn rồi<br><br>Ngay cả Thái Lan cũng kêu gọi người dân chuẩn bị cho 72 giờ sinh tồn.<br><br>Dù là biến gì đi nữa, nhưng Chính phủ các quốc gia đều kêu gọi dân phải chủ động chuẩn bị là không giỡn chơi đâu.</div></div><div class="gov"><div class="m">BÁO ĐIỆN TỬ CHÍNH PHỦ · ảnh chụp</div><h4>Thủ tướng: Phải chuẩn bị khả năng ứng phó với những tình huống chưa có tiền lệ về quân sự – quốc phòng</h4><p>15/09/2026 · (Chinhphu.vn) – Sáng 15/9, tại Hà Nội, Thủ tướng Chính phủ Lê Minh Hưng dự lễ khai giảng năm học 2026–2027 của Học viện Quốc phòng...</p></div></div>`;
+ if(m.t==="qp")return `<div class="media shot qp"><div class="who"><span class="ava blur" style="background:#8a5a44">P</span><div><div class="name"><span class="redact">tên tài khoản</span></div><div class="sub">2 ngày</div></div></div><div>${esc(m.text)}</div><div class="ph">ẢNH ĐÃ CHE · 22,4K lượt thích</div><div class="sub">${esc(m.cap)}</div></div>`;
+ if(m.t==="salary")return `<div class="media shot qp"><div class="who"><span class="ava blur" style="background:#d92d3a">B</span><div><div class="name">b••••xg</div><div class="sub">21 giờ</div></div></div><div>Góc khuất học sinh THPT. Ngày nào cũng ráng thức khuya nhận lương Threads=)) ít nhưng mà tui vẫn cố</div><div class="bank" style="margin:0"><span class="ic">★</span><div><b>Thông báo biến động số dư</b><span class="t">bây giờ</span><br>TK 09xxx695 | GD: +1,000,000VND 31/03/26 12:01 | SD: 72,685,923VND | ND: THREADS TRA LUONG 31/3</div></div><div class="sub">1,3K lượt thích · 68 bình luận</div></div>`;
+ if(m.t==="zalo")return `<div class="media shot" style="background:#111"><div class="zalo"><span class="ic">Zalo</span><div><b>Lời mời kết bạn</b><span class="t">1 giờ trước</span><br>Nguyễn Hữu T.: A là bsi khám htrc.add a hỏi chút</div></div></div>`;
+ if(m.t==="fb")return `<div class="media shot fb"><div class="ttl">Những người bạn có thể biết</div><div class="ppl">${[1,2,3].map(()=>`<div class="p"><i></i><div>• • • •<br><small>3 bạn chung</small><span>Thêm bạn bè</span></div></div>`).join("")}</div></div>`;
+ if(m.t==="ig")return `<div class="media shot ig"><i></i><div><b style="font-size:15px">••••••••</b><div class="st"><span><b>214</b>bài viết</span><span><b>1.032</b>người theo dõi</span><span><b>587</b>đang theo dõi</span></div></div><div class="eb">Chỉnh sửa trang cá nhân</div></div>`;
+ if(m.t==="blurphotos")return `<div class="media shot qp"><div class="ph" style="height:150px">3 ẢNH CHỤP NGƯỜI BỊ NÊU TÊN · ĐÃ CHE</div></div>`;
+ return"";
+}
+
+function renderPost(d){
+ const n=st.i;
+ let h="";
+ if(d.parent)h+=`<div class="parent">↳ <b>${esc(d.parent)}</b></div>`;
+ h+=`<div class="who"><span class="ava" style="background:${AV[n%AV.length]}">${ini(d.who[0])}</span><div><div class="name">${esc(d.who[0])}</div><div class="sub">${esc(d.who[1])} · ${esc(d.who[2])}</div></div></div>`;
+ h+=`<div class="body${d.news?" news":""}">${d.body.includes("<span")?d.body:esc(d.body)}</div>`;
+ h+=media(d.media);
+ if(d.acts)h+=`<div class="acts"><span>${ic("heart")}${esc(d.acts[0])}</span><span>${ic("cmt")}${esc(d.acts[1])}</span><span>${ic("rep")}${esc(d.acts[2])}</span><span>${esc(d.acts[3])}</span></div>`;
+ if(d.c.length)h+=`<div class="cmts">${d.c.map((c,k)=>`<div class="cmt${c[3]?" r":""}"><span class="ava sm" style="background:${AV[(n+k+2)%AV.length]}">${ini(c[0])}</span><div><div class="n">${esc(c[0])}<em>♥ ${esc(c[2])}</em></div><div>${c[1].includes("<span")?c[1]:esc(c[1])}</div></div></div>`).join("")}</div>`;
+ h+=`<div id="stampSlot"></div>`;
+ return h;
+}
+
+function stampSVG(k,go){
+ const c=COL[k],t=L[k].toUpperCase();
+ return `<svg class="stamp${go?" go":""}" viewBox="0 0 140 140" aria-hidden="true"><defs><path id="sr" d="M70,70 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs><circle cx="70" cy="70" r="64" fill="none" stroke="${c}" stroke-width="5"/><circle cx="70" cy="70" r="44" fill="none" stroke="${c}" stroke-width="2.5"/><text font-family="JetBrains Mono" font-size="10.5" font-weight="700" fill="${c}" letter-spacing="2"><textPath href="#sr">ĐÃ KIỂM CHỨNG · THẨM ĐỊNH TIN · </textPath></text><text x="70" y="${t.length>8?75:78}" text-anchor="middle" font-family="Be Vietnam Pro" font-weight="800" font-size="${t.length>8?14:22}" fill="${c}">${esc(t)}</text></svg>`;
+}
+
+function dots(){
+ $("dots").innerHTML=D.map((_,i)=>{const p=st.picks[i];const g=pts(i,p);return `<i class="${p?(g===2?"g":g===1?"h":"b"):(i===st.i?"now":"")}"></i>`}).join("");
+}
+
+function renderQ(){
+ const d=D[st.i];
+ $("pTeam").textContent=st.team;
+ $("pPts").textContent=total()+" đ";
+ $("cNo").textContent="THẺ "+(st.i+1)+" / "+D.length;
+ $("cKind").textContent=d.kind.toUpperCase();
+ $("post").innerHTML=renderPost(d);
+ $("claim").innerHTML=d.claim;
+ $("stamps").innerHTML=KEYS.map((k,n)=>`<button type="button" class="sbtn" style="--c:${COL[k]}" data-k="${k}"><span>${L[k]}</span><small>${n+1} · ${SUB[k]}</small></button>`).join("");
+ $("verdict").classList.add("hidden");
+ dots();
+ if(st.picks[st.i])reveal(st.picks[st.i],false);
+}
+
+function reveal(p,go){
+ const d=D[st.i],g=pts(st.i,p);
+ for(const b of $("stamps").querySelectorAll(".sbtn")){b.disabled=true;if(b.dataset.k===d.a)b.classList.add("right");if(b.dataset.k===p&&p!==d.a)b.classList.add("mine")}
+ $("stampSlot").innerHTML=stampSVG(d.a,go);
+ const vt=$("vt");vt.className="vt "+(g===2?"g":g===1?"h":"b");
+ vt.textContent=g===2?"Chính xác! +2 điểm":g===1?"Gần đúng: +1 điểm. Dấu đúng là "+L[d.a]+".":"Chưa đúng. Dấu đúng là "+L[d.a]+".";
+ $("vw").textContent=d.w;
+ $("vs").innerHTML=d.s.map(x=>`<li><a href="${esc(x[1])}" target="_blank" rel="noopener">${esc(x[0])}</a></li>`).join("");
+ $("nextBtn").textContent=st.i===D.length-1?"Xem thẻ phóng viên":"Thẻ tiếp";
+ $("verdict").classList.remove("hidden");
+ $("pPts").textContent=total()+" đ";dots();
+ if(go)$("verdict").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"nearest"});
+}
+
+function pick(k){if(st.picks[st.i])return;st.picks[st.i]=k;save();reveal(k,true)}
+function next(){if(!st.picks[st.i])return;if(st.i<D.length-1){st.i++;save();renderQ();window.scrollTo(0,0)}else finish()}
+
+function openSheet(){
+ const d=D[st.i];
+ st.looks[st.i]=1;save();
+ $("sq").textContent=d.q;
+ $("sres").innerHTML=d.r.map(r=>r[0]==="Ghi chú"||r[0].startsWith("Ghi chú")?`<article class="note"><b>${esc(r[1])}</b><br>${esc(r[2])}</article>`:`<article><div class="d">${esc(r[0])}</div><h4>${esc(r[1])}</h4><p>${esc(r[2])}</p></article>`).join("");
+ $("veil").classList.remove("hidden");$("sheet").classList.remove("hidden");$("closeSheet").focus();
+}
+function closeSheet(){$("veil").classList.add("hidden");$("sheet").classList.add("hidden");$("lookBtn").focus({preventScroll:true})}
+
+/* ---------- kết thúc + gửi form ---------- */
+function rank(t){return t>=36?"Trưởng ban kiểm chứng":t>=28?"Thư ký toà soạn":t>=16?"Biên tập viên":"Phóng viên tập sự"}
+function code(t,s){let h=7;const str=st.team+"|"+t+"|"+s+"|"+st.picks.join("");for(const ch of str)h=(h*31+ch.codePointAt(0))>>>0;return "TDTS-"+t+"-"+s+"-"+h.toString(36).toUpperCase().slice(-4)}
+function payload(){
+ const t=total(),s=secs(),c={2:0,1:0,0:0};st.picks.forEach((p,i)=>c[pts(i,p)]++);
+ const looks=st.looks.filter(Boolean).length;
+ const detail=`${GAME} | Đúng hẳn ${c[2]}, gần đúng ${c[1]}, sai ${c[0]} | Tra cứu ${looks}/20 thẻ | `+D.map((d,i)=>`${i+1}:${L[st.picks[i]]||"-"}(${pts(i,st.picks[i])})`).join(", ");
+ return {t,s,c,looks,code:code(t,s),detail};
+}
+function params(P){const u=new URLSearchParams();u.set(F.team,st.team);u.set(F.score,String(P.t));u.set(F.time,String(P.s));u.set(F.code,P.code);u.set(F.detail,P.detail);return u}
+async function send(P){
+ const box=$("eSend"),link=$("eLink");
+ box.className="send";box.textContent="Đang gửi kết quả lên Google Form…";
+ link.href=FORM+"?"+params(P).toString()+"&submit=Submit";
+ st.sent="sending";save();
+ try{
+  await fetch(FORM,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:params(P).toString()});
+  st.sent="ok";save();box.className="send ok";box.textContent="Đã gửi kết quả về Google Form của lớp.";link.classList.add("hidden");
+ }catch(e){
+  st.sent="fail";save();box.className="send fail";box.textContent="Trang này không tự gửi được (trình duyệt chặn). Bấm nút vàng bên dưới: Google Form sẽ mở ra và ghi nhận kết quả ngay, không cần điền gì.";link.classList.remove("hidden");
+ }
+}
+function finish(){
+ if(!st.end){st.end=Date.now();save()}
+ clearInterval(tick);
+ const P=payload();
+ $("eTeam").textContent=st.team;$("eRank").textContent=rank(P.t);
+ $("eScore").innerHTML=`${P.t}<span> / 40 điểm</span>`;
+ $("eTiles").innerHTML=`<div><b>${P.c[2]}</b><small>thẻ đúng hẳn</small></div><div><b>${P.c[1]}</b><small>thẻ gần đúng</small></div><div><b>${P.c[0]}</b><small>thẻ sai</small></div><div><b>${mmss(P.s)}</b><small>thời gian</small></div>`;
+ $("eCode").textContent=P.code;
+ $("eList").innerHTML=D.map((d,i)=>{const p=st.picks[i],g=pts(i,p);return `<div><b>${i+1}</b><span>${esc(d.claim.replace(/<[^>]+>/g,"")).slice(0,90).replace(/[.…\s]+$/,"")}…<br><small style="color:var(--muted)">Nhóm: ${esc(L[p]||"–")} · Đáp án: ${esc(L[d.a])}</small></span><span class="s" style="color:${g===2?"var(--ok)":g===1?"var(--c-mis)":"var(--red)"}">+${g}</span></div>`}).join("");
+ show("end");
+ if(st.sent==="ok"){const b=$("eSend");b.className="send ok";b.textContent="Đã gửi kết quả về Google Form của lớp.";$("eLink").href=FORM+"?"+params(P).toString()+"&submit=Submit"}
+ else send(P);
+}
+
+function startClock(){clearInterval(tick);const f=()=>{$("pClock").textContent=mmss(secs())};f();tick=setInterval(f,1000)}
+
+$("f").addEventListener("submit",e=>{e.preventDefault();const n=$("teamName").value.trim();if(!n){$("teamName").focus();return}
+ st={team:n,i:0,picks:[],looks:[],t0:Date.now(),end:0,sent:""};save();show("play");renderQ();startClock()});
+$("resume").addEventListener("click",()=>{const v=load();if(!v)return;st=v;st.looks=st.looks||[];if(st.end){finish();return}show("play");renderQ();startClock()});
+$("stamps").addEventListener("click",e=>{const b=e.target.closest(".sbtn");if(b&&!b.disabled)pick(b.dataset.k)});
+$("nextBtn").addEventListener("click",next);
+$("lookBtn").addEventListener("click",openSheet);
+$("closeSheet").addEventListener("click",closeSheet);
+$("veil").addEventListener("click",closeSheet);
+$("againBtn").addEventListener("click",()=>{wipe();st=null;$("teamName").value="";$("resume").classList.add("hidden");show("start");$("teamName").focus()});
+document.addEventListener("keydown",e=>{
+ if(!$("sheet").classList.contains("hidden")){if(e.key==="Escape")closeSheet();return}
+ if($("play").classList.contains("hidden")||e.target.tagName==="INPUT")return;
+ const n=parseInt(e.key,10);
+ if(n>=1&&n<=5&&!st.picks[st.i]){pick(KEYS[n-1]);e.preventDefault()}
+ else if((e.key==="t"||e.key==="T")&&!st.picks[st.i]){openSheet();e.preventDefault()}
+ else if(e.key==="Enter"&&st.picks[st.i]&&!["BUTTON","A"].includes(e.target.tagName)){next();e.preventDefault()}
+});
+const saved=load();
+if(saved){$("resume").classList.remove("hidden");$("resume").textContent=saved.end?"Xem lại kết quả của "+saved.team:"Chơi tiếp lượt của "+saved.team}
+}
+</script>
+</body>
+</html>
