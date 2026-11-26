@@ -270,6 +270,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
    </ol>
    <p class="sub" style="margin:12px 0 0">Tên tài khoản cá nhân đã được che; thông tin nhận dạng người bị nhắc đến đã bị xoá.</p>
   </div>
+  <div class="panel hidden" id="hostWarn" style="border:2px solid var(--red)"><b>Trang này chỉ là bản xem thử, kết quả sẽ không tự lưu vào Google Form.</b><br>Để chơi và lưu kết quả, mở game tại: <a href="https://thaobich1990-crypto.github.io/newsliteracy/tindungtinsai/" target="_blank" rel="noopener" style="overflow-wrap:anywhere">https://thaobich1990-crypto.github.io/newsliteracy/tindungtinsai/</a></div>
   <form class="panel" id="f" autocomplete="off">
    <label for="teamName">Tên nhóm</label>
    <input class="field" id="teamName" maxlength="40" placeholder="Ví dụ: Nhóm 3" required>
@@ -703,6 +704,7 @@ document.addEventListener("keydown",e=>{
  else if((e.key==="t"||e.key==="T")&&!st.picks[st.i]){openSheet();e.preventDefault()}
  else if(e.key==="Enter"&&st.picks[st.i]&&!["BUTTON","A"].includes(e.target.tagName)){next();e.preventDefault()}
 });
+if(!/github\.io$/.test(location.hostname))$("hostWarn").classList.remove("hidden");
 const saved=load();
 if(saved){$("resume").classList.remove("hidden");$("resume").textContent=saved.end?"Xem lại kết quả của "+saved.team:"Chơi tiếp lượt của "+saved.team}
 }
