@@ -219,7 +219,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
  .stamps:not(.two) .sbtn:first-child{grid-column:1/-1}
  .bonus .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .stamp{width:112px;height:112px;right:10px;bottom:10px}
- .tools .hint{display:none}
+
  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
  .legend li{grid-template-columns:92px 1fr}
  .wx .hours{font-size:11px}
@@ -234,7 +234,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
   <div class="col">
    <div class="kick">BÀN KIỂM CHỨNG · PHIÊN BẢN THPT</div>
    <h1>Tin đúng – <span>Tin sai</span></h1>
-   <p>20 bài đăng thật trên Threads, tháng 11/2026. Đọc kỹ, tra cứu, rồi đóng dấu Đúng hoặc Sai.</p>
+   <p>20 bài đăng thật trên Threads, tháng 11/2026. Đọc kỹ, tự tra cứu, rồi đóng dấu Đúng hoặc Sai.</p>
   </div>
   <svg viewBox="0 0 680 210" role="img" aria-label="Một bài đăng trên điện thoại được soi bằng kính lúp và đóng dấu đã kiểm chứng">
    <defs><path id="ring" d="M560,105 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs>
@@ -276,7 +276,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
    </ul>
    <ol class="howto">
     <li>Mỗi thẻ là một bài đăng kèm <b>nhận định cần thẩm định</b>.</li>
-    <li>Bấm <b>Tra cứu</b> để xem kết quả tìm kiếm từ báo chí, nghiên cứu, cơ quan chính thức.</li>
+    <li>Nhóm <b>tự tra cứu</b> trên mạng (Google, báo chí, trang chính thức) để kiểm chứng trước khi đóng dấu. Giải thích và nguồn chỉ hiện sau khi đã chọn.</li>
     <li>Chọn đúng <b>Đúng / Sai</b>: +2 điểm.</li>
     <li>Nếu là tin sai, nhóm được trả lời thêm câu hỏi <b>điểm cộng</b>: tin sai thuộc loại nào (+1 điểm). Không chắc thì bấm Bỏ qua, không bị trừ điểm.</li>
     <li>Hết 20 thẻ, kết quả tự gửi về Google Form của lớp.</li>
@@ -301,7 +301,7 @@ label{display:block;font-weight:700;margin:0 0 6px}
   <p class="cardno"><span id="cNo"></span><span id="cKind"></span></p>
   <article class="post" id="post"></article>
   <div class="claim"><div class="k">NHẬN ĐỊNH CẦN THẨM ĐỊNH</div><p id="claim"></p></div>
-  <div class="tools"><button class="btn ghost" type="button" id="lookBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Tra cứu</button><span class="hint" id="hint">Phím tắt: 1 Đúng, 2 Sai, T tra cứu</span></div>
+  <div class="tools"><p class="hint" id="hint" style="margin:0;font-size:14px;color:var(--muted)">Tự tra cứu trước khi đóng dấu: tìm trên Google, báo chí chính thống, trang của cơ quan nhà nước hoặc nghiên cứu khoa học. Đối chiếu ngày đăng và nguồn gốc của thông tin.</p></div>
   <div class="stamps two" id="stamps" role="group" aria-label="Đóng dấu Đúng hoặc Sai"></div>
   <div class="bonus hidden" id="bonus"></div>
   <div class="verdict hidden" id="verdict" aria-live="polite">
@@ -682,7 +682,7 @@ function openSheet(){
  $("sres").innerHTML=d.r.map(r=>r[0]==="Ghi chú"||r[0].startsWith("Ghi chú")?`<article class="note"><b>${esc(r[1])}</b><br>${esc(r[2])}</article>`:`<article><div class="d">${esc(r[0])}</div><h4>${esc(r[1])}</h4><p>${esc(r[2])}</p></article>`).join("");
  $("veil").classList.remove("hidden");$("sheet").classList.remove("hidden");$("closeSheet").focus();
 }
-function closeSheet(){$("veil").classList.add("hidden");$("sheet").classList.add("hidden");$("lookBtn").focus({preventScroll:true})}
+function closeSheet(){$("veil").classList.add("hidden");$("sheet").classList.add("hidden")}
 
 /* ---------- kết thúc + gửi form ---------- */
 function rank(t){return t>=40?"Trưởng ban kiểm chứng":t>=28?"Thư ký toà soạn":t>=16?"Biên tập viên":"Phóng viên tập sự"}
@@ -691,7 +691,7 @@ function payload(){
  const t=total(),s=secs();let ok=0,bad=0,bs=0;
  D.forEach((_,i)=>{if(base(i)===2)ok++;else bad++;bs+=bon(i)});
  const looks=st.looks.filter(Boolean).length;
- const detail=`${GAME} | Phán đoán đúng ${ok}/20, sai ${bad} | Điểm cộng ${bs}/${MAXB} | Tra cứu ${looks}/20 thẻ | `+D.map((d,i)=>{const p=st.picks[i],b=(st.bonus||[])[i];return `${i+1}:${p==="t"?"Đúng":p==="f"?"Sai":"-"}${b&&b!=="skip"?"/"+L[b]:""}(${pts(i)})`}).join(", ");
+ const detail=`${GAME} | Phán đoán đúng ${ok}/20, sai ${bad} | Điểm cộng ${bs}/${MAXB} | `+D.map((d,i)=>{const p=st.picks[i],b=(st.bonus||[])[i];return `${i+1}:${p==="t"?"Đúng":p==="f"?"Sai":"-"}${b&&b!=="skip"?"/"+L[b]:""}(${pts(i)})`}).join(", ");
  return {t,s,ok,bad,bs,looks,code:code(t,s),detail};
 }
 function params(P){const u=new URLSearchParams();u.set(F.team,st.team);u.set(F.score,String(P.t));u.set(F.time,String(P.s));u.set(F.code,P.code);u.set(F.detail,P.detail);return u}
@@ -729,7 +729,7 @@ $("resume").addEventListener("click",()=>{const v=load();if(!v)return;st=v;st.lo
 $("stamps").addEventListener("click",e=>{const b=e.target.closest(".sbtn");if(b&&!b.disabled)pickJ(b.dataset.j)});
 $("bonus").addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(b&&!b.disabled)pickB(b.dataset.b)});
 $("nextBtn").addEventListener("click",next);
-$("lookBtn").addEventListener("click",openSheet);
+
 $("post").addEventListener("click",e=>{const im=e.target.closest(".shotimg");if(!im)return;$("lbImg").src=im.src;$("lb").classList.remove("hidden");$("lbClose").focus()});
 $("lbClose").addEventListener("click",()=>{$("lb").classList.add("hidden");$("lbImg").src=""});
 $("closeSheet").addEventListener("click",closeSheet);
@@ -742,7 +742,6 @@ document.addEventListener("keydown",e=>{
  const n=parseInt(e.key,10);
  if(!st.picks[st.i]&&(n===1||n===2)){pickJ(n===1?"t":"f");e.preventDefault()}
  else if(needB(st.i)&&n>=0&&n<=4){pickB(n===0?"skip":BK[n-1]);e.preventDefault()}
- else if((e.key==="t"||e.key==="T")&&!st.picks[st.i]){openSheet();e.preventDefault()}
  else if(e.key==="Enter"&&done(st.i)&&!["BUTTON","A"].includes(e.target.tagName)){next();e.preventDefault()}
 });
 if(!/github\.io$/.test(location.hostname))$("hostWarn").classList.remove("hidden");
